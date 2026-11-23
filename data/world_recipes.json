@@ -1,0 +1,1874 @@
+{
+ "_about": "Typical home recipes written for Thalika. Nutrients are computed from USDA SR Legacy ingredients (raw weights). Ingredient keys map to exact SR names in 'ingredients'.",
+ "ingredients": {
+  "rice": "Rice, white, short-grain, cooked, unenriched",
+  "rice_long": "Rice, white, long-grain, regular, enriched, cooked",
+  "glutinous_rice_flour": "Rice flour, white, unenriched",
+  "egg_noodles": "Noodles, egg, cooked, enriched, with added salt",
+  "rice_noodles": "Rice noodles, cooked",
+  "soba": "Noodles, japanese, soba, cooked",
+  "wheat_noodles": "Pasta, cooked, enriched, without added salt",
+  "glass_noodles": "Noodles, chinese, cellophane or long rice (mung beans), dehydrated",
+  "chicken_breast": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+  "chicken_thigh": "Chicken, broilers or fryers, dark meat, thigh, meat only, raw",
+  "beef_sirloin": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\" fat, all grades, raw",
+  "beef_short_ribs": "Beef, short loin, t-bone steak, separable lean and fat, trimmed to 1/8\" fat, all grades, raw",
+  "pork_shoulder": "Pork, fresh, shoulder, whole, separable lean and fat, raw",
+  "pork_belly": "Pork, fresh, belly, raw",
+  "pork_loin": "Pork, fresh, loin, whole, separable lean and fat, raw",
+  "ground_pork": "Pork, fresh, ground, raw",
+  "lamb_leg": "Lamb, leg, whole (shank and sirloin), separable lean and fat, trimmed to 1/4\" fat, choice, raw",
+  "shrimp": "Crustaceans, shrimp, mixed species, raw (may contain additives to retain moisture)",
+  "octopus": "Mollusks, octopus, common, raw",
+  "salmon": "Fish, salmon, Atlantic, farmed, raw",
+  "tuna": "Fish, tuna, fresh, bluefin, raw",
+  "tofu_firm": "Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari)",
+  "tofu_soft": "Tofu, soft, prepared with calcium sulfate and magnesium chloride (nigari)",
+  "egg": "Egg, whole, raw, fresh",
+  "soy_sauce": "Soy sauce made from soy and wheat (shoyu)",
+  "sesame_oil": "Oil, sesame, salad or cooking",
+  "oil": "Oil, vegetable, soybean, refined",
+  "olive_oil": "Oil, olive, salad or cooking",
+  "sugar": "Sugars, granulated",
+  "honey": "Honey",
+  "garlic": "Garlic, raw",
+  "ginger": "Ginger root, raw",
+  "onion": "Onions, raw",
+  "scallion": "Onions, spring or scallions (includes tops and bulb), raw",
+  "carrot": "Carrots, raw",
+  "cabbage": "Cabbage, raw",
+  "napa": "Cabbage, chinese (pe-tsai), raw",
+  "spinach": "Spinach, raw",
+  "bean_sprouts": "Mung beans, mature seeds, sprouted, raw",
+  "shiitake": "Mushrooms, shiitake, raw",
+  "cucumber": "Cucumber, with peel, raw",
+  "nori": "Seaweed, laver, raw",
+  "flour": "Wheat flour, white, all-purpose, enriched, unbleached",
+  "panko": "Bread, crumbs, dry, grated, plain",
+  "cornstarch": "Cornstarch",
+  "kimchi": "Cabbage, kimchi",
+  "miso": "Miso",
+  "red_pepper": "Peppers, sweet, red, raw",
+  "chili_powder": "Spices, pepper, red or cayenne",
+  "peanuts": "Peanuts, all types, dry-roasted, without salt",
+  "peanut_butter": "Peanut butter, smooth style, without salt",
+  "lime_juice": "Lime juice, raw",
+  "lemon_juice": "Lemon juice, raw",
+  "coconut_milk": "Nuts, coconut milk, canned (liquid expressed from grated meat and water)",
+  "potato": "Potatoes, flesh and skin, raw",
+  "tomato": "Tomatoes, red, ripe, raw, year round average",
+  "eggplant": "Eggplant, raw",
+  "zucchini": "Squash, summer, zucchini, includes skin, raw",
+  "chickpeas": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+  "tahini": "Seeds, sesame butter, tahini, from roasted and toasted kernels (most common type)",
+  "yogurt": "Yogurt, plain, whole milk",
+  "pita": "Bread, pita, white, enriched",
+  "baguette": "Bread, french or vienna (includes sourdough)",
+  "parsley": "Parsley, fresh",
+  "cilantro": "Coriander (cilantro) leaves, raw",
+  "bulgur": "Bulgur, cooked",
+  "sesame_seeds": "Seeds, sesame seeds, whole, roasted and toasted",
+  "oyster_sauce": "Sauce, oyster, ready-to-serve",
+  "hoisin": "Sauce, hoisin, ready-to-serve",
+  "fish_sauce": "Sauce, fish, ready-to-serve",
+  "mayonnaise": "Salad dressing, mayonnaise, regular",
+  "butter": "Butter, salted",
+  "pickled_radish": "Radishes, raw",
+  "daikon": "Radishes, oriental, raw",
+  "zucchini_k": "Squash, summer, zucchini, includes skin, raw",
+  "beef_broth": "Soup, beef broth or bouillon canned, ready-to-serve",
+  "chicken_broth": "Soup, chicken broth, ready-to-serve",
+  "water": "Beverages, water, tap, drinking",
+  "milk": "Milk, whole, 3.25% milkfat, with added vitamin D",
+  "cream": "Cream, fluid, heavy whipping",
+  "parmesan": "Cheese, parmesan, grated",
+  "mozzarella": "Cheese, mozzarella, whole milk",
+  "pasta": "Pasta, cooked, enriched, without added salt",
+  "bacon": "Pork, cured, bacon, unprepared",
+  "curry_roux_flour": "Wheat flour, white, all-purpose, enriched, unbleached",
+  "curry_powder": "Spices, curry powder",
+  "green_beans": "Beans, snap, green, raw",
+  "basil": "Basil, fresh",
+  "bamboo": "Bamboo shoots, canned, drained solids",
+  "chicken_whole": "Chicken, broilers or fryers, meat and skin, raw",
+  "avocado": "Avocados, raw, all commercial varieties",
+  "rice_vinegar": "Vinegar, distilled",
+  "anchovy_stock": "Beverages, water, tap, drinking"
+ },
+ "recipes": [
+  {
+   "name": "Bulgogi (Korean marinated beef)",
+   "alt": "불고기",
+   "cuisine": "Korean",
+   "servings": 4,
+   "serving": "1 plate (without rice)",
+   "items": [
+    [
+     "beef_sirloin",
+     500
+    ],
+    [
+     "soy_sauce",
+     60
+    ],
+    [
+     "sugar",
+     25
+    ],
+    [
+     "honey",
+     15
+    ],
+    [
+     "sesame_oil",
+     15
+    ],
+    [
+     "garlic",
+     15
+    ],
+    [
+     "onion",
+     100
+    ],
+    [
+     "scallion",
+     30
+    ],
+    [
+     "oil",
+     10
+    ],
+    [
+     "sesame_seeds",
+     5
+    ]
+   ]
+  },
+  {
+   "name": "Bibimbap (mixed rice bowl with beef and egg)",
+   "alt": "비빔밥",
+   "cuisine": "Korean",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "rice",
+     400
+    ],
+    [
+     "beef_sirloin",
+     120
+    ],
+    [
+     "spinach",
+     100
+    ],
+    [
+     "bean_sprouts",
+     100
+    ],
+    [
+     "carrot",
+     60
+    ],
+    [
+     "shiitake",
+     50
+    ],
+    [
+     "zucchini_k",
+     60
+    ],
+    [
+     "egg",
+     100
+    ],
+    [
+     "sesame_oil",
+     15
+    ],
+    [
+     "soy_sauce",
+     20
+    ],
+    [
+     "chili_powder",
+     5
+    ],
+    [
+     "sugar",
+     10
+    ],
+    [
+     "oil",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Japchae (stir-fried glass noodles)",
+   "alt": "잡채",
+   "cuisine": "Korean",
+   "servings": 4,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "glass_noodles",
+     200
+    ],
+    [
+     "beef_sirloin",
+     150
+    ],
+    [
+     "spinach",
+     150
+    ],
+    [
+     "carrot",
+     80
+    ],
+    [
+     "onion",
+     100
+    ],
+    [
+     "shiitake",
+     80
+    ],
+    [
+     "red_pepper",
+     80
+    ],
+    [
+     "soy_sauce",
+     60
+    ],
+    [
+     "sugar",
+     25
+    ],
+    [
+     "sesame_oil",
+     25
+    ],
+    [
+     "oil",
+     20
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "sesame_seeds",
+     5
+    ]
+   ]
+  },
+  {
+   "name": "Kimbap (seaweed rice rolls)",
+   "alt": "김밥",
+   "cuisine": "Korean",
+   "servings": 4,
+   "serving": "1 roll (8-10 pieces)",
+   "items": [
+    [
+     "rice",
+     600
+    ],
+    [
+     "nori",
+     10
+    ],
+    [
+     "egg",
+     150
+    ],
+    [
+     "carrot",
+     100
+    ],
+    [
+     "spinach",
+     100
+    ],
+    [
+     "cucumber",
+     80
+    ],
+    [
+     "daikon",
+     80
+    ],
+    [
+     "beef_sirloin",
+     100
+    ],
+    [
+     "sesame_oil",
+     20
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "oil",
+     10
+    ],
+    [
+     "sesame_seeds",
+     5
+    ]
+   ]
+  },
+  {
+   "name": "Kimchi jjigae (kimchi stew with pork and tofu)",
+   "alt": "김치찌개",
+   "cuisine": "Korean",
+   "servings": 3,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "kimchi",
+     300
+    ],
+    [
+     "pork_shoulder",
+     200
+    ],
+    [
+     "tofu_firm",
+     200
+    ],
+    [
+     "onion",
+     80
+    ],
+    [
+     "scallion",
+     30
+    ],
+    [
+     "chili_powder",
+     5
+    ],
+    [
+     "sesame_oil",
+     10
+    ],
+    [
+     "sugar",
+     5
+    ],
+    [
+     "water",
+     600
+    ]
+   ]
+  },
+  {
+   "name": "Sundubu jjigae (soft tofu stew)",
+   "alt": "순두부찌개",
+   "cuisine": "Korean",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "tofu_soft",
+     350
+    ],
+    [
+     "shrimp",
+     80
+    ],
+    [
+     "pork_shoulder",
+     60
+    ],
+    [
+     "egg",
+     50
+    ],
+    [
+     "onion",
+     50
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "chili_powder",
+     8
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "water",
+     400
+    ]
+   ]
+  },
+  {
+   "name": "Doenjang jjigae (soybean paste stew)",
+   "alt": "된장찌개",
+   "cuisine": "Korean",
+   "servings": 3,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "miso",
+     60
+    ],
+    [
+     "tofu_firm",
+     200
+    ],
+    [
+     "zucchini_k",
+     120
+    ],
+    [
+     "potato",
+     120
+    ],
+    [
+     "onion",
+     80
+    ],
+    [
+     "shiitake",
+     50
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "water",
+     600
+    ]
+   ]
+  },
+  {
+   "name": "Kimchi fried rice",
+   "alt": "김치볶음밥",
+   "cuisine": "Korean",
+   "servings": 2,
+   "serving": "1 plate",
+   "items": [
+    [
+     "rice",
+     400
+    ],
+    [
+     "kimchi",
+     200
+    ],
+    [
+     "bacon",
+     60
+    ],
+    [
+     "egg",
+     100
+    ],
+    [
+     "oil",
+     20
+    ],
+    [
+     "sesame_oil",
+     10
+    ],
+    [
+     "soy_sauce",
+     10
+    ],
+    [
+     "sugar",
+     5
+    ],
+    [
+     "scallion",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Korean fried chicken (yangnyeom)",
+   "alt": "양념치킨",
+   "cuisine": "Korean",
+   "servings": 4,
+   "serving": "1 plate (about 6 pieces)",
+   "items": [
+    [
+     "chicken_whole",
+     900
+    ],
+    [
+     "cornstarch",
+     80
+    ],
+    [
+     "flour",
+     40
+    ],
+    [
+     "oil",
+     90
+    ],
+    [
+     "chili_powder",
+     10
+    ],
+    [
+     "soy_sauce",
+     30
+    ],
+    [
+     "honey",
+     40
+    ],
+    [
+     "sugar",
+     30
+    ],
+    [
+     "garlic",
+     20
+    ],
+    [
+     "tomato",
+     40
+    ]
+   ]
+  },
+  {
+   "name": "Galbi (grilled marinated short ribs)",
+   "alt": "갈비",
+   "cuisine": "Korean",
+   "servings": 4,
+   "serving": "1 plate (meat only)",
+   "items": [
+    [
+     "beef_short_ribs",
+     800
+    ],
+    [
+     "soy_sauce",
+     80
+    ],
+    [
+     "sugar",
+     40
+    ],
+    [
+     "honey",
+     20
+    ],
+    [
+     "sesame_oil",
+     20
+    ],
+    [
+     "garlic",
+     25
+    ],
+    [
+     "onion",
+     80
+    ]
+   ]
+  },
+  {
+   "name": "Samgyeopsal (grilled pork belly)",
+   "alt": "삼겹살",
+   "cuisine": "Korean",
+   "servings": 3,
+   "serving": "1 portion (meat only, about 130 g raw)",
+   "items": [
+    [
+     "pork_belly",
+     400
+    ],
+    [
+     "sesame_oil",
+     10
+    ],
+    [
+     "garlic",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Tteokbokki (spicy rice cakes)",
+   "alt": "떡볶이",
+   "cuisine": "Korean",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "glutinous_rice_flour",
+     220
+    ],
+    [
+     "water",
+     450
+    ],
+    [
+     "chili_powder",
+     10
+    ],
+    [
+     "sugar",
+     30
+    ],
+    [
+     "soy_sauce",
+     20
+    ],
+    [
+     "cabbage",
+     80
+    ],
+    [
+     "scallion",
+     30
+    ],
+    [
+     "egg",
+     100
+    ],
+    [
+     "oil",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Mandu (pork and vegetable dumplings)",
+   "alt": "만두",
+   "cuisine": "Korean",
+   "servings": 5,
+   "serving": "6 dumplings",
+   "items": [
+    [
+     "flour",
+     250
+    ],
+    [
+     "water",
+     130
+    ],
+    [
+     "ground_pork",
+     250
+    ],
+    [
+     "tofu_firm",
+     150
+    ],
+    [
+     "napa",
+     150
+    ],
+    [
+     "glass_noodles",
+     30
+    ],
+    [
+     "scallion",
+     30
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "sesame_oil",
+     10
+    ],
+    [
+     "oil",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Haemul pajeon (seafood scallion pancake)",
+   "alt": "해물파전",
+   "cuisine": "Korean",
+   "servings": 2,
+   "serving": "1 pancake",
+   "items": [
+    [
+     "flour",
+     120
+    ],
+    [
+     "water",
+     160
+    ],
+    [
+     "egg",
+     50
+    ],
+    [
+     "scallion",
+     120
+    ],
+    [
+     "shrimp",
+     100
+    ],
+    [
+     "oil",
+     40
+    ]
+   ]
+  },
+  {
+   "name": "Sashimi, mixed salmon and tuna",
+   "alt": "刺身",
+   "cuisine": "Japanese",
+   "servings": 1,
+   "serving": "1 plate (about 10 slices)",
+   "items": [
+    [
+     "salmon",
+     75
+    ],
+    [
+     "tuna",
+     75
+    ],
+    [
+     "daikon",
+     40
+    ],
+    [
+     "soy_sauce",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Onigiri (rice ball with salmon)",
+   "alt": "おにぎり",
+   "cuisine": "Japanese",
+   "servings": 4,
+   "serving": "1 rice ball",
+   "items": [
+    [
+     "rice",
+     440
+    ],
+    [
+     "salmon",
+     80
+    ],
+    [
+     "nori",
+     4
+    ]
+   ]
+  },
+  {
+   "name": "Udon noodle soup (kake udon)",
+   "alt": "うどん",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "wheat_noodles",
+     500
+    ],
+    [
+     "soy_sauce",
+     40
+    ],
+    [
+     "sugar",
+     15
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "water",
+     700
+    ]
+   ]
+  },
+  {
+   "name": "Tonkatsu (breaded pork cutlet)",
+   "alt": "とんかつ",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 cutlet",
+   "items": [
+    [
+     "pork_loin",
+     300
+    ],
+    [
+     "flour",
+     20
+    ],
+    [
+     "egg",
+     50
+    ],
+    [
+     "panko",
+     60
+    ],
+    [
+     "oil",
+     40
+    ],
+    [
+     "cabbage",
+     100
+    ]
+   ]
+  },
+  {
+   "name": "Japanese chicken curry with rice (kare raisu)",
+   "alt": "カレーライス",
+   "cuisine": "Japanese",
+   "servings": 4,
+   "serving": "1 plate",
+   "items": [
+    [
+     "rice",
+     800
+    ],
+    [
+     "chicken_thigh",
+     350
+    ],
+    [
+     "potato",
+     250
+    ],
+    [
+     "carrot",
+     150
+    ],
+    [
+     "onion",
+     200
+    ],
+    [
+     "butter",
+     40
+    ],
+    [
+     "curry_roux_flour",
+     45
+    ],
+    [
+     "curry_powder",
+     10
+    ],
+    [
+     "sugar",
+     10
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "water",
+     700
+    ]
+   ]
+  },
+  {
+   "name": "Gyudon (beef and onion rice bowl)",
+   "alt": "牛丼",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "rice",
+     450
+    ],
+    [
+     "beef_sirloin",
+     220
+    ],
+    [
+     "onion",
+     150
+    ],
+    [
+     "soy_sauce",
+     40
+    ],
+    [
+     "sugar",
+     20
+    ],
+    [
+     "water",
+     150
+    ]
+   ]
+  },
+  {
+   "name": "Oyakodon (chicken and egg rice bowl)",
+   "alt": "親子丼",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "rice",
+     450
+    ],
+    [
+     "chicken_thigh",
+     220
+    ],
+    [
+     "egg",
+     150
+    ],
+    [
+     "onion",
+     100
+    ],
+    [
+     "soy_sauce",
+     35
+    ],
+    [
+     "sugar",
+     15
+    ],
+    [
+     "water",
+     150
+    ],
+    [
+     "scallion",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Gyoza (pan-fried pork dumplings)",
+   "alt": "餃子",
+   "cuisine": "Japanese",
+   "servings": 4,
+   "serving": "6 gyoza",
+   "items": [
+    [
+     "flour",
+     180
+    ],
+    [
+     "water",
+     90
+    ],
+    [
+     "ground_pork",
+     250
+    ],
+    [
+     "cabbage",
+     200
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "ginger",
+     10
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "sesame_oil",
+     10
+    ],
+    [
+     "oil",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Chicken karaage (Japanese fried chicken)",
+   "alt": "唐揚げ",
+   "cuisine": "Japanese",
+   "servings": 3,
+   "serving": "1 plate (about 6 pieces)",
+   "items": [
+    [
+     "chicken_thigh",
+     500
+    ],
+    [
+     "soy_sauce",
+     30
+    ],
+    [
+     "ginger",
+     10
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "cornstarch",
+     60
+    ],
+    [
+     "oil",
+     60
+    ]
+   ]
+  },
+  {
+   "name": "Okonomiyaki (cabbage pancake with pork)",
+   "alt": "お好み焼き",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 pancake",
+   "items": [
+    [
+     "flour",
+     100
+    ],
+    [
+     "water",
+     100
+    ],
+    [
+     "egg",
+     100
+    ],
+    [
+     "cabbage",
+     250
+    ],
+    [
+     "pork_belly",
+     80
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "mayonnaise",
+     20
+    ],
+    [
+     "hoisin",
+     30
+    ]
+   ]
+  },
+  {
+   "name": "Takoyaki (octopus balls)",
+   "alt": "たこ焼き",
+   "cuisine": "Japanese",
+   "servings": 3,
+   "serving": "8 balls",
+   "items": [
+    [
+     "flour",
+     120
+    ],
+    [
+     "egg",
+     50
+    ],
+    [
+     "water",
+     400
+    ],
+    [
+     "octopus",
+     120
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "oil",
+     20
+    ],
+    [
+     "mayonnaise",
+     30
+    ],
+    [
+     "hoisin",
+     30
+    ]
+   ]
+  },
+  {
+   "name": "Tonkotsu ramen with pork belly and egg",
+   "alt": "豚骨ラーメン",
+   "cuisine": "Japanese",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "wheat_noodles",
+     350
+    ],
+    [
+     "pork_belly",
+     150
+    ],
+    [
+     "egg",
+     100
+    ],
+    [
+     "chicken_broth",
+     800
+    ],
+    [
+     "cream",
+     40
+    ],
+    [
+     "soy_sauce",
+     30
+    ],
+    [
+     "miso",
+     20
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "nori",
+     3
+    ],
+    [
+     "sesame_oil",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Mapo tofu",
+   "alt": "麻婆豆腐",
+   "cuisine": "Chinese",
+   "servings": 3,
+   "serving": "1 bowl (without rice)",
+   "items": [
+    [
+     "tofu_soft",
+     400
+    ],
+    [
+     "ground_pork",
+     150
+    ],
+    [
+     "oil",
+     30
+    ],
+    [
+     "chili_powder",
+     8
+    ],
+    [
+     "soy_sauce",
+     20
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "ginger",
+     10
+    ],
+    [
+     "cornstarch",
+     10
+    ],
+    [
+     "scallion",
+     20
+    ],
+    [
+     "water",
+     200
+    ]
+   ]
+  },
+  {
+   "name": "Char siu (Chinese barbecue pork)",
+   "alt": "叉烧",
+   "cuisine": "Chinese",
+   "servings": 4,
+   "serving": "100 g slices",
+   "items": [
+    [
+     "pork_shoulder",
+     600
+    ],
+    [
+     "hoisin",
+     50
+    ],
+    [
+     "honey",
+     40
+    ],
+    [
+     "soy_sauce",
+     30
+    ],
+    [
+     "sugar",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Steamed pork buns (char siu bao)",
+   "alt": "叉烧包",
+   "cuisine": "Chinese",
+   "servings": 8,
+   "serving": "1 bun",
+   "items": [
+    [
+     "flour",
+     300
+    ],
+    [
+     "water",
+     150
+    ],
+    [
+     "sugar",
+     30
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "pork_shoulder",
+     200
+    ],
+    [
+     "hoisin",
+     30
+    ],
+    [
+     "oyster_sauce",
+     20
+    ],
+    [
+     "onion",
+     50
+    ]
+   ]
+  },
+  {
+   "name": "Massaman chicken curry",
+   "alt": "แกงมัสมั่น",
+   "cuisine": "Thai",
+   "servings": 4,
+   "serving": "1 bowl (without rice)",
+   "items": [
+    [
+     "chicken_thigh",
+     500
+    ],
+    [
+     "coconut_milk",
+     400
+    ],
+    [
+     "potato",
+     300
+    ],
+    [
+     "onion",
+     150
+    ],
+    [
+     "peanuts",
+     50
+    ],
+    [
+     "curry_powder",
+     20
+    ],
+    [
+     "fish_sauce",
+     25
+    ],
+    [
+     "sugar",
+     20
+    ],
+    [
+     "oil",
+     15
+    ]
+   ]
+  },
+  {
+   "name": "Chicken satay with peanut sauce",
+   "alt": "สะเต๊ะ",
+   "cuisine": "Thai",
+   "servings": 4,
+   "serving": "4 skewers with sauce",
+   "items": [
+    [
+     "chicken_thigh",
+     500
+    ],
+    [
+     "coconut_milk",
+     150
+    ],
+    [
+     "peanut_butter",
+     80
+    ],
+    [
+     "curry_powder",
+     10
+    ],
+    [
+     "sugar",
+     20
+    ],
+    [
+     "fish_sauce",
+     15
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "lime_juice",
+     15
+    ]
+   ]
+  },
+  {
+   "name": "Thai basil chicken (pad kra pao) with rice",
+   "alt": "ผัดกะเพรา",
+   "cuisine": "Thai",
+   "servings": 2,
+   "serving": "1 plate",
+   "items": [
+    [
+     "rice_long",
+     400
+    ],
+    [
+     "chicken_thigh",
+     250
+    ],
+    [
+     "basil",
+     20
+    ],
+    [
+     "garlic",
+     15
+    ],
+    [
+     "chili_powder",
+     3
+    ],
+    [
+     "oyster_sauce",
+     20
+    ],
+    [
+     "soy_sauce",
+     15
+    ],
+    [
+     "fish_sauce",
+     10
+    ],
+    [
+     "sugar",
+     8
+    ],
+    [
+     "oil",
+     25
+    ],
+    [
+     "egg",
+     100
+    ]
+   ]
+  },
+  {
+   "name": "Banh mi (Vietnamese pork sandwich)",
+   "alt": "bánh mì",
+   "cuisine": "Vietnamese",
+   "servings": 1,
+   "serving": "1 sandwich",
+   "items": [
+    [
+     "baguette",
+     120
+    ],
+    [
+     "pork_shoulder",
+     80
+    ],
+    [
+     "mayonnaise",
+     15
+    ],
+    [
+     "carrot",
+     30
+    ],
+    [
+     "daikon",
+     30
+    ],
+    [
+     "cucumber",
+     30
+    ],
+    [
+     "cilantro",
+     5
+    ],
+    [
+     "soy_sauce",
+     5
+    ],
+    [
+     "sugar",
+     5
+    ]
+   ]
+  },
+  {
+   "name": "Chicken shawarma wrap",
+   "alt": "شاورما",
+   "cuisine": "Middle Eastern",
+   "servings": 2,
+   "serving": "1 wrap",
+   "items": [
+    [
+     "pita",
+     120
+    ],
+    [
+     "chicken_thigh",
+     250
+    ],
+    [
+     "olive_oil",
+     20
+    ],
+    [
+     "yogurt",
+     60
+    ],
+    [
+     "garlic",
+     8
+    ],
+    [
+     "lemon_juice",
+     15
+    ],
+    [
+     "tomato",
+     60
+    ],
+    [
+     "onion",
+     40
+    ],
+    [
+     "cucumber",
+     40
+    ],
+    [
+     "tahini",
+     20
+    ]
+   ]
+  },
+  {
+   "name": "Baba ghanoush (smoky eggplant dip)",
+   "alt": "بابا غنوج",
+   "cuisine": "Middle Eastern",
+   "servings": 6,
+   "serving": "3 tbsp",
+   "items": [
+    [
+     "eggplant",
+     600
+    ],
+    [
+     "tahini",
+     60
+    ],
+    [
+     "lemon_juice",
+     30
+    ],
+    [
+     "olive_oil",
+     20
+    ],
+    [
+     "garlic",
+     8
+    ]
+   ]
+  },
+  {
+   "name": "Lamb kofta kebab",
+   "alt": "كفتة",
+   "cuisine": "Middle Eastern",
+   "servings": 4,
+   "serving": "2 skewers",
+   "items": [
+    [
+     "lamb_leg",
+     500
+    ],
+    [
+     "onion",
+     80
+    ],
+    [
+     "parsley",
+     15
+    ],
+    [
+     "olive_oil",
+     10
+    ]
+   ]
+  },
+  {
+   "name": "Tom yum soup with shrimp",
+   "alt": "ต้มยำกุ้ง",
+   "cuisine": "Thai",
+   "servings": 3,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "shrimp",
+     250
+    ],
+    [
+     "shiitake",
+     100
+    ],
+    [
+     "tomato",
+     100
+    ],
+    [
+     "onion",
+     50
+    ],
+    [
+     "lime_juice",
+     30
+    ],
+    [
+     "fish_sauce",
+     30
+    ],
+    [
+     "sugar",
+     8
+    ],
+    [
+     "chili_powder",
+     3
+    ],
+    [
+     "chicken_broth",
+     750
+    ]
+   ]
+  },
+  {
+   "name": "Thai green curry with chicken",
+   "alt": "แกงเขียวหวาน",
+   "cuisine": "Thai",
+   "servings": 4,
+   "serving": "1 bowl (without rice)",
+   "items": [
+    [
+     "chicken_thigh",
+     450
+    ],
+    [
+     "coconut_milk",
+     400
+    ],
+    [
+     "eggplant",
+     150
+    ],
+    [
+     "green_beans",
+     80
+    ],
+    [
+     "bamboo",
+     80
+    ],
+    [
+     "basil",
+     15
+    ],
+    [
+     "fish_sauce",
+     25
+    ],
+    [
+     "sugar",
+     15
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "chili_powder",
+     4
+    ]
+   ]
+  },
+  {
+   "name": "Bun cha (grilled pork with rice noodles)",
+   "alt": "bún chả",
+   "cuisine": "Vietnamese",
+   "servings": 2,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "ground_pork",
+     250
+    ],
+    [
+     "rice_noodles",
+     300
+    ],
+    [
+     "fish_sauce",
+     30
+    ],
+    [
+     "sugar",
+     25
+    ],
+    [
+     "lime_juice",
+     20
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "carrot",
+     40
+    ],
+    [
+     "cucumber",
+     60
+    ],
+    [
+     "basil",
+     10
+    ],
+    [
+     "cilantro",
+     10
+    ],
+    [
+     "water",
+     150
+    ]
+   ]
+  },
+  {
+   "name": "Vietnamese lemongrass chicken with rice (com ga)",
+   "alt": "cơm gà",
+   "cuisine": "Vietnamese",
+   "servings": 2,
+   "serving": "1 plate",
+   "items": [
+    [
+     "rice_long",
+     400
+    ],
+    [
+     "chicken_thigh",
+     300
+    ],
+    [
+     "fish_sauce",
+     20
+    ],
+    [
+     "sugar",
+     15
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "oil",
+     15
+    ],
+    [
+     "cucumber",
+     60
+    ],
+    [
+     "tomato",
+     60
+    ]
+   ]
+  },
+  {
+   "name": "Kung pao chicken",
+   "alt": "宫保鸡丁",
+   "cuisine": "Chinese",
+   "servings": 3,
+   "serving": "1 plate (without rice)",
+   "items": [
+    [
+     "chicken_thigh",
+     450
+    ],
+    [
+     "peanuts",
+     60
+    ],
+    [
+     "red_pepper",
+     100
+    ],
+    [
+     "scallion",
+     40
+    ],
+    [
+     "soy_sauce",
+     35
+    ],
+    [
+     "sugar",
+     15
+    ],
+    [
+     "cornstarch",
+     15
+    ],
+    [
+     "oil",
+     35
+    ],
+    [
+     "garlic",
+     10
+    ],
+    [
+     "ginger",
+     10
+    ],
+    [
+     "chili_powder",
+     3
+    ]
+   ]
+  },
+  {
+   "name": "Japanese miso soup with tofu and wakame",
+   "alt": "味噌汁",
+   "cuisine": "Japanese",
+   "servings": 4,
+   "serving": "1 bowl",
+   "items": [
+    [
+     "miso",
+     60
+    ],
+    [
+     "tofu_soft",
+     150
+    ],
+    [
+     "nori",
+     4
+    ],
+    [
+     "scallion",
+     15
+    ],
+    [
+     "water",
+     800
+    ]
+   ]
+  }
+ ]
+}

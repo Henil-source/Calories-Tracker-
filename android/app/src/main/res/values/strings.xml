@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Thalika</string>
+    <string name="title_activity_main">Thalika</string>
+    <string name="package_name">app.thalika.tracker</string>
+    <string name="custom_url_scheme">app.thalika.tracker</string>
+</resources>
