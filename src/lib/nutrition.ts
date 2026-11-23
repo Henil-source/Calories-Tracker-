@@ -38,3 +38,6 @@ export function bmi(kg: number, cm: number) {
   const m = cm / 100;
   return Math.round((kg / (m * m)) * 10) / 10;
 }
+
+/** The target the formula suggests, ignoring any limit the user set. */
+export const recommendedTarget = (p: Profile) => dailyTarget({ ...p, kcalOverride: null });

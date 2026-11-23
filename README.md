@@ -1,20 +1,22 @@
 # Thalika
 
-A free calorie tracker for Indian, French and American food. Android app and desktop app (Windows, macOS, Linux) from one codebase.
+A free calorie tracker for Indian, French, American and world food. Android app and desktop app (Windows, macOS, Linux) from one codebase.
 
-- **Daily diary** by meal with a calorie target worked out from your body and goal, calories left, protein, carbs and fat.
-- **17,772 foods on the device**, per 100 g with household portions:
+- **Daily diary** by meal: calories left, protein, carbs and fat. The target is worked out from your body and goal, or **set your own daily limit** (tap the target on the diary).
+- **17,814 foods on the device**, per 100 g with household portions, filterable by cuisine (Indian, French, American, Korean, Japanese, Chinese, Thai, Vietnamese, Italian, Mexican, Middle Eastern, Greek, Spanish):
   - Indian Nutrient Databank (INDB): 1,014 Indian dishes
   - ANSES-CIQUAL: 3,341 French foods
   - USDA FNDDS survey foods: 5,624 American foods as eaten
   - USDA SR Legacy: 7,793 basic foods and ingredients
-- **Photo estimate**: snap a plate, get each item with an estimated weight, matched to the food table, editable before saving. Uses your own Claude API key (set in Me).
+  - 42 world dishes the open tables lack (bulgogi, japchae, gyoza, tonkatsu, massaman, banh mi, shawarma...), computed from USDA ingredients using typical home recipes (`data/world_recipes.json`)
+- **Build a dish from raw ingredients**: add each ingredient and its amount, say how many servings it makes, and get kcal per serving. Saved under My foods to log again, edit or delete.
+- **Metric or imperial**: kg/cm or lb/ft+in for height and weight.
 - Packaged foods and barcodes from Open Food Facts (optional), quick calories, your own foods, water, weight, 7/30-day progress, backup/restore, delete everything.
 - No account, no server. Your diary stays on your device.
 
-| Diary | Photo estimate | Search |
-|---|---|---|
-| ![Diary](replica/clone-screens/S02-diary.png) | ![Photo](replica/clone-screens/S05-snap-review.png) | ![Search](replica/clone-screens/S03-add-food.png) |
+| Diary | Daily limit | Korean dishes | Build from ingredients |
+|---|---|---|---|
+| ![Diary](replica/clone-screens/S02-diary.png) | ![Limit](replica/clone-screens/S02-daily-limit.png) | ![Korean](replica/clone-screens/S03-add-food-korean.png) | ![Recipe](replica/clone-screens/S05-recipe.png) |
 
 ## Get the app
 Every push builds the apps in GitHub Actions. Open the latest **Build** run under the Actions tab and download:
@@ -40,7 +42,7 @@ npm run db -- --src ../data-src           # writes public/data/foods.json
 ```
 
 ## Layout
-- `src/`: the app (React + TypeScript). `src/lib/` has the logic: food search, targets, storage, photo estimate.
+- `src/`: the app (React + TypeScript). `src/lib/` has the logic: food search, targets, units, storage, the Android back button.
 - `public/data/foods.json`: the food table.
 - `android/`: Capacitor Android project. `electron/`: desktop shell.
 - `scripts/`: data build, icons, screenshots.

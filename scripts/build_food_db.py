@@ -5,8 +5,13 @@ Inputs live in a source folder (default: ../data-src), laid out like
 scripts/fetch_sources.sh leaves it. Every value comes straight from the source
 tables; nothing is invented. Values are per 100 g of edible food.
 
-Output row: [id, name, alt, src, group, kcal, protein, carbs, fat, fibre, portions]
+Output row: [id, name, alt, src, group, kcal, protein, carbs, fat, fibre, portions, cuisine]
 portions: [[label, grams], ...]
+cuisine: short code (IN, FR, US, KR, JP, CN, TH, VN, MX, IT, ME, MD, ES) or "".
+
+World dishes that the open tables lack (bulgogi, gyoza, banh mi...) come from
+data/world_recipes.json: typical home recipes whose values are computed from
+SR Legacy ingredients, marked with source "RC" (recipe estimate).
 """
 import argparse, json, math, os, re, sys
 
@@ -133,6 +138,53 @@ def load_sr(src):
         out.append(["sr:" + k, clean(name), "", "SR", grp, *[r1(a) for a in v], portions.get(k, [])[:6]])
     return out
 
+# ------------------------------------------------------------- cuisine tags
+CUISINE_WORDS = {
+    "KR": r"korean|kimchi|bulgogi|bibimbap|japchae|kimbap|gimbap|galbi|kalbi|jjigae|tteok|gochujang|doenjang|banchan|samgyeopsal|mandu|pajeon",
+    "JP": r"japanese|sushi|sashimi|teriyaki|tempura|miso|ramen|udon|soba|somen|edamame|wasabi|gyoza|tonkatsu|katsu|onigiri|donburi|yakitori|okonomiyaki|takoyaki|mochi|natto|karaage|nori|seaweed|matcha|shiitake|sake\b|tofu",
+    "CN": r"chinese|chow mein|lo mein|chop suey|fried rice|egg roll|spring roll|wonton|dim sum|dumpling|bao\b|kung pao|szechuan|sichuan|hunan|general tso|sweet and sour|moo shu|moo goo|mapo|char siu|hoisin|bok choy|pak.?choi|egg foo young|lychee|tofu",
+    "TH": r"thai|pad thai|satay|massaman|tom yum|tom kha|green curry|red curry|lemongrass|galangal|panang",
+    "VN": r"vietnam|pho\b|banh mi|bánh|nem\b|rice paper|spring roll|summer roll",
+    "MX": r"mexican|taco|burrito|enchilada|quesadilla|tamale|tostada|fajita|nacho|salsa|guacamole|chimichanga|tortilla|refried|chile relleno|pozole|menudo|churro|flauta|sopapilla|mole\b|chilaquiles|jalape",
+    "IT": r"italian|pasta|spaghetti|lasagn|ravioli|tortellini|gnocchi|risotto|pizza|calzone|lasagne|fettuccine|linguine|penne|macaroni|cannelloni|parmigiana|parmesan|mozzarella|ricotta|prosciutto|salami|pesto|bruschetta|focaccia|tiramisu|gelato|polenta|minestrone|carbonara|bolognese|alfredo|marinara|biscotti|panna cotta|antipast",
+    "ME": r"middle eastern|hummus|houmous|falafel|shawarma|kebab|kabob|kofta|tabbouleh|taboul|baba gh|tahini|pita\b|halva|baklava|fattoush|labneh|shakshuka|couscous|tajine|tagine|harissa|lebanese|turkish|moroccan|persian",
+    "MD": r"greek|gyro|tzatziki|feta|moussaka|spanakopita|souvlaki|dolma|mediterranean",
+    "ES": r"spanish|paella|gazpacho|tortilla espa|chorizo|tapas|churros|empanada|sangria|serrano",
+}
+CUISINE_RE = [(c, re.compile(r"\b(?:" + w + r")", re.I)) for c, w in CUISINE_WORDS.items()]
+
+def cuisine_of(name, src):
+    if src == "IN":
+        return "IN"
+    for c, rx in CUISINE_RE:
+        if rx.search(name):
+            return c
+    return {"FR": "FR", "US": "US"}.get(src, "")
+
+# ---------------------------------------------------- world dishes (recipes)
+def load_recipes(sr_rows, path):
+    with open(path, encoding="utf-8") as f:
+        w = json.load(f)
+    by_name = {r[1]: r for r in sr_rows}
+    codes = {"Korean": "KR", "Japanese": "JP", "Chinese": "CN", "Thai": "TH", "Vietnamese": "VN",
+             "Middle Eastern": "ME", "Mexican": "MX", "Italian": "IT", "Mediterranean": "MD", "Spanish": "ES"}
+    out = []
+    for i, rc in enumerate(w["recipes"]):
+        tot = [0.0] * 5
+        grams = 0.0
+        for key, g in rc["items"]:
+            r = by_name[w["ingredients"][key]]
+            grams += g
+            for j in range(5):
+                tot[j] += (r[5 + j] or 0) * g / 100
+        per100 = [r1(t * 100 / grams) for t in tot]
+        per100[0] = round(per100[0])
+        serving = round(grams / rc["servings"])
+        slug = re.sub(r"[^a-z0-9]+", "-", rc["name"].lower()).strip("-")[:40]
+        out.append(["rc:" + slug, rc["name"], rc.get("alt", ""), "RC", rc["cuisine"] + " dishes", *per100,
+                    [[rc["serving"], serving]], codes[rc["cuisine"]]])
+    return out
+
 SOURCES = {
     "IN": {"name": "Indian Nutrient Databank (INDB)", "by": "Lindsay Jaacks and colleagues (Current Developments in Nutrition, 2024)",
             "url": "https://github.com/lindsayjaacks/Indian-Nutrient-Databank-INDB-", "licence": "Open access (see repository and Current Developments in Nutrition, 2024)"},
@@ -142,6 +194,8 @@ SOURCES = {
             "url": "https://fdc.nal.usda.gov/", "licence": "Public domain (CC0)"},
     "SR": {"name": "USDA SR Legacy (FoodData Central)", "by": "USDA Agricultural Research Service",
             "url": "https://fdc.nal.usda.gov/", "licence": "Public domain (CC0)"},
+    "RC": {"name": "Thalika world dish estimates", "by": "Typical home recipes, computed from USDA SR Legacy ingredients",
+            "url": "https://github.com/Henil-source/Calories-Tracker-/blob/main/data/world_recipes.json", "licence": "CC0 (recipes) on CC0 data"},
 }
 
 def main():
@@ -154,9 +208,15 @@ def main():
         got = fn(a.src)
         print(f"{label}: {len(got)} foods", file=sys.stderr)
         rows += got
+    rows = [r + [cuisine_of(r[1] + " " + r[2], r[3])] for r in rows]
+    rec = load_recipes([r for r in rows if r[3] == "SR"], os.path.join(os.path.dirname(__file__), "..", "data", "world_recipes.json"))
+    print(f"RC: {len(rec)} world dishes", file=sys.stderr)
+    rows += rec
+    from collections import Counter
+    print("cuisines:", dict(Counter(r[11] for r in rows)), file=sys.stderr)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     with open(a.out, "w", encoding="utf-8") as f:
-        json.dump({"version": 1, "per": "100 g", "sources": SOURCES, "foods": rows}, f,
+        json.dump({"version": 2, "per": "100 g", "sources": SOURCES, "foods": rows}, f,
                   ensure_ascii=False, separators=(",", ":"))
     print(f"total {len(rows)} -> {a.out} ({os.path.getsize(a.out)//1024} KB)", file=sys.stderr)
 

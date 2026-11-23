@@ -3,11 +3,13 @@ import { addDays, dayKey } from "../lib/date";
 import { totals } from "../lib/meals";
 import { setWeight, useStore } from "../lib/store";
 import { Seg, useToast } from "../components/ui";
+import { weightFrom, weightText, weightUnit } from "../lib/units";
 
 export default function Progress({ target }: { target: number }) {
   const log = useStore((s) => s.log);
   const weights = useStore((s) => s.weights);
   const profile = useStore((s) => s.profile);
+  const units = useStore((s) => s.settings.units);
   const [range, setRange] = useState<"7" | "30">("7");
   const [w, setW] = useState("");
   const toast = useToast();
@@ -36,9 +38,9 @@ export default function Progress({ target }: { target: number }) {
   const todayTotals = totals(log.filter((e) => e.day === today));
 
   const saveWeight = () => {
-    const kg = Number(w.replace(",", "."));
-    if (!(kg >= 25 && kg <= 300)) return toast("Enter a weight between 25 and 300 kg");
-    setWeight(today, Math.round(kg * 10) / 10); setW(""); toast("Weight saved");
+    const kg = weightFrom(Number(w.replace(",", ".")), units);
+    if (!(kg >= 25 && kg <= 300)) return toast(`Enter a weight between ${weightText(25, units)} and ${weightText(300, units)}`);
+    setWeight(today, Math.round(kg * 100) / 100); setW(""); toast("Weight saved");
   };
   const lastW = weights.slice(-8);
   const wMin = Math.min(...lastW.map((x) => x.kg), profile?.targetKg ?? Infinity) - 1;
@@ -74,14 +76,14 @@ export default function Progress({ target }: { target: number }) {
             {lastW.slice().reverse().map((x) => (
               <li key={x.day} className="row between" style={{ padding: "6px 0" }}>
                 <span>{x.day}</span>
-                <span className="row"><span className="bar" style={{ width: 120 }}><span style={{ width: `${((x.kg - wMin) / (wMax - wMin)) * 100}%`, background: "var(--accent)" }} /></span><strong className="num">{x.kg} kg</strong></span>
+                <span className="row"><span className="bar" style={{ width: 120 }}><span style={{ width: `${((x.kg - wMin) / (wMax - wMin)) * 100}%`, background: "var(--accent)" }} /></span><strong className="num">{weightText(x.kg, units)}</strong></span>
               </li>
             ))}
           </ul>
         ) : <p className="muted small" style={{ margin: 0 }}>Log your weight once a week to see the trend.</p>}
-        {profile && profile.goal !== "maintain" && <p className="small muted" style={{ margin: 0 }}>Goal: {profile.targetKg} kg</p>}
+        {profile && profile.goal !== "maintain" && <p className="small muted" style={{ margin: 0 }}>Goal: {weightText(profile.targetKg, units)}</p>}
         <form className="row" onSubmit={(e) => { e.preventDefault(); saveWeight(); }}>
-          <label className="grow field">Today's weight (kg)<input className="input num" inputMode="decimal" value={w} onChange={(e) => setW(e.target.value)} /></label>
+          <label className="grow field">Today's weight ({weightUnit(units)})<input className="input num" inputMode="decimal" value={w} onChange={(e) => setW(e.target.value)} /></label>
           <button className="btn" style={{ alignSelf: "flex-end" }} type="submit" disabled={!w}>Save</button>
         </form>
       </section>

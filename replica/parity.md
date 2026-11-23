@@ -28,3 +28,7 @@ Same structure as the category norm (ring summary on top, meals as cards, centre
 
 ## Verdict
 **Shippable** for a beta: all must-haves, score 93, no open S1/S2. It becomes "better than the original" on the axes reviewers complain about (no subscription or upsell, data stays on the device, delete in app), but that claim still needs real users. Not yet verified on a physical Android phone.
+
+## Round 2 update (23 Nov 2026)
+- Photo logging (F04) was removed at the owner's request; parity for it no longer applies.
+- New: custom daily limit, metric/imperial, recipe builder from raw ingredients, cuisine filter with Korean/Japanese/Chinese/Thai/Vietnamese and more. These match HealthifyMe's "set your own goal", unit switch, "create recipe" and regional cuisine coverage at feature level.

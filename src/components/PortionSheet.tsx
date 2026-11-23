@@ -73,7 +73,8 @@ export function sourceLong(f: Food) {
     case "US": return "USDA FNDDS survey foods";
     case "SR": return "USDA SR Legacy";
     case "OFF": return "Open Food Facts (packaged product label)";
-    default: return f.group === "Photo estimate" ? "a photo estimate" : "a food you added";
+    case "RC": return "a typical home recipe, computed from USDA SR Legacy ingredients";
+    default: return f.recipe ? `your recipe (${f.recipe.items.length} ingredients, ${f.recipe.servings} serving${f.recipe.servings === 1 ? "" : "s"})` : f.group === "Photo estimate" ? "a photo estimate" : "a food you added";
   }
 }
 

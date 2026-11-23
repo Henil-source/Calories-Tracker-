@@ -100,66 +100,126 @@ test("F03-H1 quick calories and water", async ({ page }) => {
   await expect(page.getByText("0.25 / 2.5 L")).toBeVisible();
 });
 
-test("F04-H1 photo estimate with a mocked Claude reply", async ({ page }) => {
-  await page.route("https://api.anthropic.com/**", async (route) => {
-    const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "POST, OPTIONS" };
-    if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
-    const body = JSON.parse(route.request().postData() || "{}");
-    expect(body.model).toBe("claude-opus-5-5");
-    expect(body.messages[0].content[0].type).toBe("image");
-    const result = {
-      is_food: true, note: "Oil used in the dal is hard to see.",
-      items: [
-        { name: "chapati", local_name: "roti", cuisine: "Indian", search_terms: ["chapati", "roti"], grams: 80, portion_text: "2 rotis", kcal: 230, protein_g: 7, carbs_g: 36, fat_g: 6, confidence: "high" },
-        { name: "dal", local_name: "dal tadka", cuisine: "Indian", search_terms: ["dal tadka", "dal"], grams: 200, portion_text: "1 bowl", kcal: 240, protein_g: 12, carbs_g: 30, fat_g: 8, confidence: "medium" },
-      ],
-    };
-    return route.fulfill({ status: 200, headers: { ...cors, "content-type": "application/json" }, body: JSON.stringify({
-      id: "msg_test", type: "message", role: "assistant", model: "claude-opus-5-5", stop_reason: "end_turn", stop_sequence: null,
-      content: [{ type: "text", text: JSON.stringify(result) }], usage: { input_tokens: 10, output_tokens: 10 },
-    }) });
-  });
-  await onboard(page);
-  await page.getByRole("button", { name: "Snap" }).click();
-  await expect(page.getByText(/need your own Claude API key/)).toBeVisible(); // F04-E1
-  await page.getByRole("button", { name: "Add API key" }).click();
-  await page.getByLabel("Claude API key").fill("not-a-key"); // F04-N1
-  await page.getByRole("button", { name: "Save key" }).click();
-  await expect(page.getByRole("status")).toContainText("doesn't look like");
-  await page.getByLabel("Claude API key").fill("sk-ant-test-0000");
-  await page.getByRole("button", { name: "Save key" }).click();
-  await page.getByRole("button", { name: "Snap" }).click();
-  await page.getByTestId("file-input").setInputFiles("e2e/plate.jpg");
-  await expect(page.getByAltText("Your meal photo")).toBeVisible();
-  await page.getByRole("button", { name: "Estimate calories" }).click();
-  await expect(page.getByRole("region", { name: "chapati" })).toBeVisible();
-  await expect(page.getByRole("region", { name: "dal" })).toBeVisible();
+test("F04-H1 set my own daily limit", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel(/Year of birth/).fill("1994");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByText(/Use the suggested target/)).toBeVisible();
+  await page.getByLabel("Set my own limit").check();
+  await page.getByLabel("My daily limit (kcal)").fill("300"); // F04-N1
+  await page.getByRole("button", { name: "Start tracking" }).click();
+  await expect(page.getByText(/Enter a limit between 800 and 6000/)).toBeVisible();
+  await page.getByLabel("My daily limit (kcal)").fill("1600");
   await axe(page);
-  await noSideScroll(page);
-  await page.getByRole("region", { name: "chapati" }).getByLabel("Weight (g)").fill("120");
-  await page.getByLabel("Add to").selectOption("lunch");
-  await page.getByRole("button", { name: "Add to diary" }).click();
-  await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
-  const lunch = page.getByRole("region", { name: "Lunch" });
-  await expect(lunch.getByText("from photo").first()).toBeVisible();
-  await expect(lunch.getByRole("button", { name: /Edit$/ })).toHaveCount(2);
+  await page.getByRole("button", { name: "Start tracking" }).click();
+  await expect(page.getByRole("button", { name: "Daily limit 1600 kcal. Change" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Calories summary" }).getByText("1,600", { exact: true })).toBeVisible();
+  // change it from the diary
+  await page.getByRole("button", { name: "Daily limit 1600 kcal. Change" }).click();
+  const sheet = page.getByRole("dialog", { name: "Daily calorie limit" });
+  await sheet.getByLabel("My daily limit (kcal)").fill("1750");
+  await axe(page);
+  await sheet.getByRole("button", { name: "Save limit" }).click();
+  await expect(page.getByRole("button", { name: "Daily limit 1750 kcal. Change" })).toBeVisible();
+  await page.getByRole("button", { name: /Daily limit 1750/ }).click();
+  await page.getByLabel(/Use the suggested target/).check();
+  await page.getByRole("button", { name: "Save limit" }).click();
+  await expect(page.getByRole("button", { name: /^Daily target \d+ kcal\. Change$/ })).toBeVisible();
 });
 
-test("F04-N2 rejected API key shows a fix", async ({ page }) => {
-  await page.route("https://api.anthropic.com/**", (route) => {
-    const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "*" };
-    if (route.request().method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
-    return route.fulfill({ status: 401, headers: { ...cors, "content-type": "application/json" }, body: JSON.stringify({ type: "error", error: { type: "authentication_error", message: "invalid x-api-key" } }) });
-  });
-  await onboard(page);
+test("F07-H1 imperial units are converted and stored in metric", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel(/Year of birth/).fill("1990");
+  await page.getByRole("button", { name: "Imperial (lb, ft)" }).click();
+  await page.getByLabel("Height, feet").fill("5");
+  await page.getByLabel("Height, inches").fill("3");
+  await page.getByLabel("Weight (lb)").fill("150");
+  await axe(page);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByLabel("Goal weight (lb)").fill("135");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Start tracking" }).click();
+  const prof = await page.evaluate(() => JSON.parse(localStorage.getItem("thalika.v1")!).profile);
+  expect(prof.heightCm).toBeCloseTo(160, 0);
+  expect(prof.weightKg).toBeCloseTo(68, 0);
+  expect(prof.targetKg).toBeCloseTo(61.2, 0);
+  await page.getByRole("button", { name: "Progress" }).click();
+  await expect(page.getByText("150 lb")).toBeVisible();
+  await page.getByLabel("Today's weight (lb)").fill("149");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByText("149 lb")).toBeVisible();
   await page.getByRole("button", { name: "Me" }).click();
-  await page.getByLabel("Claude API key").fill("sk-ant-bad");
-  await page.getByRole("button", { name: "Save key" }).click();
-  await page.getByRole("button", { name: "Snap" }).click();
-  await page.getByTestId("file-input").setInputFiles("e2e/plate.jpg");
-  await page.getByRole("button", { name: "Estimate calories" }).click();
-  await expect(page.getByRole("alert")).toContainText("key was rejected");
-  errors.splice(0); // the 401 is logged by the browser on purpose here
+  await expect(page.getByLabel("Height, feet")).toHaveValue("5");
+  await page.getByRole("button", { name: "Metric (kg, cm)" }).click();
+  await expect(page.getByLabel("Height (cm)")).toHaveValue("160");
+  await expect(page.getByLabel("Weight (kg)", { exact: true })).toHaveValue("67.6");
+});
+
+test("F08-H1 build a dish from raw ingredients", async ({ page }) => {
+  await onboard(page);
+  await page.getByRole("button", { name: "Add food to Lunch" }).click();
+  await page.getByRole("searchbox", { name: "Search foods" }).fill("Nani's chicken pulao");
+  await page.getByRole("button", { name: /Build "Nani's chicken pulao" from ingredients/ }).click();
+  const dlg = page.getByRole("dialog", { name: "New recipe" });
+  await expect(dlg.getByLabel("Dish name")).toHaveValue("Nani's chicken pulao");
+  await dlg.getByRole("button", { name: "Save and log it" }).click(); // F08-N1
+  await expect(dlg.getByRole("alert")).toContainText("Add at least one ingredient");
+  const ing = dlg.getByRole("searchbox", { name: "Search ingredients" });
+  await ing.fill("rice white long grain cooked");
+  await dlg.getByRole("list", { name: "Ingredient matches" }).getByRole("button").first().click();
+  await dlg.getByLabel(/^Unit for Rice/).selectOption({ label: "1 g" });
+  await dlg.getByLabel(/^Amount of Rice/).fill("600");
+  await ing.fill("chicken thigh raw");
+  await dlg.getByRole("list", { name: "Ingredient matches" }).getByRole("button").first().click();
+  await dlg.getByLabel(/^Unit for Chicken/).selectOption({ label: "1 g" });
+  await dlg.getByLabel(/^Amount of Chicken/).fill("400");
+  await ing.fill("ghee");
+  await dlg.getByRole("list", { name: "Ingredient matches" }).getByRole("button").first().click();
+  await dlg.getByLabel(/^Unit for Ghee/).selectOption({ label: "1 g" });
+  await dlg.getByLabel(/^Amount of Ghee/).fill("30");
+  await dlg.getByLabel("Servings it makes").fill("4");
+  const per = Number((await dlg.getByRole("region", { name: "Recipe totals" }).getByText(/^\d+ kcal$/).last().textContent())!.replace(/\D/g, ""));
+  expect(per).toBeGreaterThan(250);
+  expect(per).toBeLessThan(700);
+  await axe(page);
+  await noSideScroll(page);
+  await dlg.getByRole("button", { name: "Save and log it" }).click();
+  await expect(page.getByRole("dialog", { name: "Choose amount" })).toContainText("Nani's chicken pulao");
+  await page.getByRole("button", { name: "Add to lunch" }).click();
+  await page.getByRole("button", { name: "My foods" }).click();
+  await expect(page.getByRole("button", { name: "Edit recipe Nani's chicken pulao" })).toBeVisible();
+  await page.getByRole("button", { name: "Edit recipe Nani's chicken pulao" }).click();
+  await page.getByLabel("Servings it makes").fill("5");
+  await page.getByRole("button", { name: "Save recipe" }).click();
+  await expect(page.getByRole("status")).toContainText("Saved Nani's chicken pulao");
+  await page.getByRole("button", { name: "Back to today" }).click();
+  const logged = page.getByRole("region", { name: "Lunch" }).getByRole("button", { name: /Nani's chicken pulao, \d+ kcal/ });
+  await expect(logged).toBeVisible();
+  const got = Number((await logged.getAttribute("aria-label"))!.match(/(\d+) kcal/)![1]);
+  expect(Math.abs(got - per)).toBeLessThanOrEqual(1); // logged entries keep the numbers they were logged with
+});
+
+test("F09-H1 browse Korean, Japanese and Chinese dishes", async ({ page }) => {
+  await onboard(page);
+  await page.getByRole("button", { name: "Add food to Dinner" }).click();
+  const cuisine = page.getByRole("group", { name: "Cuisine" });
+  await cuisine.getByRole("button", { name: "Korean" }).click();
+  await expect(page.getByRole("button", { name: /Bulgogi/ }).first()).toBeVisible();
+  await page.getByRole("searchbox", { name: "Search foods" }).fill("kimchi");
+  await expect(page.getByRole("button", { name: /Kimchi jjigae/ })).toBeVisible();
+  await cuisine.getByRole("button", { name: "Japanese" }).click();
+  await page.getByRole("searchbox", { name: "Search foods" }).fill("gyoza");
+  await page.getByRole("button", { name: /^Gyoza/ }).first().click();
+  await expect(page.getByRole("dialog", { name: "Choose amount" })).toContainText("6 gyoza");
+  await page.getByRole("button", { name: "Close" }).click();
+  await cuisine.getByRole("button", { name: "Chinese" }).click();
+  await page.getByRole("searchbox", { name: "Search foods" }).fill("mapo");
+  await expect(page.getByRole("button", { name: /Mapo tofu/ }).first()).toBeVisible();
+  await axe(page);
+  await noSideScroll(page);
 });
 
 test("F05-H1 progress and weight", async ({ page }) => {

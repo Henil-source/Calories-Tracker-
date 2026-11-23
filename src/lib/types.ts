@@ -1,4 +1,7 @@
-export type SourceCode = "IN" | "FR" | "US" | "SR" | "OFF" | "MY";
+export type SourceCode = "IN" | "FR" | "US" | "SR" | "RC" | "OFF" | "MY";
+
+/** Cuisine tag on each food. "" means a basic ingredient with no cuisine. */
+export type Cuisine = "IN" | "FR" | "US" | "KR" | "JP" | "CN" | "TH" | "VN" | "MX" | "IT" | "ME" | "MD" | "ES";
 
 export interface Portion { label: string; grams: number }
 
@@ -14,6 +17,9 @@ export interface Food {
   fat: number | null;
   fibre: number | null;
   portions: Portion[];
+  cuisine?: Cuisine | "";
+  /** For foods built from raw ingredients (recipes the user made). */
+  recipe?: { servings: number; items: { foodId: string; name: string; grams: number }[] };
 }
 
 export type MealKey = "breakfast" | "morning" | "lunch" | "evening" | "dinner";
@@ -32,7 +38,7 @@ export interface LogEntry {
   carbs: number;
   fat: number;
   fibre: number;
-  via: "search" | "photo" | "quick" | "barcode";
+  via: "search" | "photo" | "quick" | "barcode" | "recipe"; // "photo" only in older diaries
   createdAt: string;  // ISO UTC
 }
 
@@ -51,12 +57,13 @@ export interface Profile {
   goal: GoalKind;
   pace: number;        // kg per week, 0.25 / 0.5 / 0.75
   kcalOverride: number | null;
-  cuisines: ("IN" | "FR" | "US")[];
+  cuisines: Cuisine[];
 }
 
+export type Units = "metric" | "imperial";
+
 export interface Settings {
-  apiKey: string;
-  model: string;
+  units: Units;
   onlineSearch: boolean;
   waterGoalMl: number;
 }

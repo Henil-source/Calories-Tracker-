@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Droplet, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Droplet, Minus, Pencil, Plus } from "lucide-react";
 import { addDays, dayKey, prettyDay } from "../lib/date";
 import { MEALS, totals } from "../lib/meals";
 import { macroTargets } from "../lib/nutrition";
@@ -8,6 +8,7 @@ import type { LogEntry, MealKey } from "../lib/types";
 import { Bar, Ring, useToast } from "../components/ui";
 import PortionSheet, { makeEntry } from "../components/PortionSheet";
 import { foodForEntry } from "../lib/entryFood";
+import { LimitSheet } from "../components/LimitPicker";
 
 export default function Today({ day, setDay, target, onAdd }: { day: string; setDay: (d: string) => void; target: number; onAdd: (m: MealKey) => void }) {
   const log = useStore((s) => s.log);
@@ -15,6 +16,7 @@ export default function Today({ day, setDay, target, onAdd }: { day: string; set
   const waterGoal = useStore((s) => s.settings.waterGoalMl);
   const profile = useStore((s) => s.profile);
   const [editing, setEditing] = useState<LogEntry | null>(null);
+  const [limitOpen, setLimitOpen] = useState(false);
   const toast = useToast();
 
   const entries = useMemo(() => log.filter((e) => e.day === day), [log, day]);
@@ -41,7 +43,10 @@ export default function Today({ day, setDay, target, onAdd }: { day: string; set
           </Ring>
           <div className="stack" style={{ gap: 8 }}>
             <div className="kv"><span className="muted">Eaten</span><strong className="num">{Math.round(t.kcal).toLocaleString()} kcal</strong></div>
-            <div className="kv"><span className="muted">Daily target</span><strong className="num">{target.toLocaleString()} kcal</strong></div>
+            <button className="kv target-btn" onClick={() => setLimitOpen(true)} aria-label={`Daily ${profile?.kcalOverride != null ? "limit" : "target"} ${target} kcal. Change`}>
+              <span className="muted">{profile?.kcalOverride != null ? "Daily limit" : "Daily target"}</span>
+              <strong className="num row" style={{ gap: 4 }}>{target.toLocaleString()} kcal <Pencil size={14} aria-hidden="true" /></strong>
+            </button>
             <Bar label="Protein" value={t.protein} max={mt.protein} color="var(--protein)" />
             <Bar label="Carbs" value={t.carbs} max={mt.carbs} color="var(--carbs)" />
             <Bar label="Fat" value={t.fat} max={mt.fat} color="var(--fat)" />
@@ -63,7 +68,7 @@ export default function Today({ day, setDay, target, onAdd }: { day: string; set
               <button key={e.id} className="entry" onClick={() => setEditing(e)} aria-label={`${e.name}, ${e.kcal} kcal. Edit`}>
                 <span className="grow">
                   <span className="ellipsis" style={{ display: "block" }}>{e.name}</span>
-                  <span className="xs muted">{formatQty(e)}{e.via === "photo" ? " · from photo" : ""}</span>
+                  <span className="xs muted">{formatQty(e)}</span>
                 </span>
                 <span className="kcal num">{e.kcal}</span>
               </button>
@@ -85,6 +90,7 @@ export default function Today({ day, setDay, target, onAdd }: { day: string; set
         </div>
       </section>
 
+      {limitOpen && profile && <LimitSheet profile={profile} onClose={() => setLimitOpen(false)} />}
       {editing && (() => {
         const food = foodForEntry(editing);
         return (

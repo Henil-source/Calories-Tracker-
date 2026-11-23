@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { useBackHandler } from "../lib/back";
 
 export function Sheet({ title, onClose, children, labelId = "sheet-title" }: { title: string; onClose: () => void; children: ReactNode; labelId?: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  useBackHandler(onClose);
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
     const el = ref.current!;

@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
-import { Download, Eye, EyeOff, Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { dbInfo } from "../lib/foods";
 import { ACTIVITY_LABEL, bmi, dailyTarget } from "../lib/nutrition";
 import { exportJson, importJson, update, useStore, wipeAll } from "../lib/store";
-import { SNAP_MODELS } from "../lib/models";
 import type { Activity, GoalKind, Profile } from "../lib/types";
-import { profileFieldHelpers, validateProfile } from "./Onboarding";
+import { CuisinePicker, paceLabel, profileFieldHelpers, setUnits, validateProfile } from "./Onboarding";
+import { HeightField, UnitsToggle, WeightField } from "../components/BodyInputs";
+import { LimitPicker } from "../components/LimitPicker";
 import { Seg, Sheet, useToast } from "../components/ui";
 
 export default function Me() {
@@ -13,28 +14,21 @@ export default function Me() {
   const settings = useStore((s) => s.settings);
   const [p, setP] = useState<Profile>(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showKey, setShowKey] = useState(false);
-  const [key, setKey] = useState(settings.apiKey);
   const [confirmWipe, setConfirmWipe] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const { numIn } = profileFieldHelpers({ p, set: setP, errors });
   const info = dbInfo();
 
+  const units = settings.units;
   const saveProfile = () => {
-    const e = validateProfile(p);
+    const e = validateProfile(p, units);
     setErrors(e);
     if (Object.keys(e).length) return;
     update((s) => ({ ...s, profile: p }));
     toast("Profile saved");
   };
 
-  const saveKey = () => {
-    const k = key.trim();
-    if (k && !k.startsWith("sk-ant-")) { toast("That doesn't look like a Claude API key (it starts with sk-ant-)"); return; }
-    update((s) => ({ ...s, settings: { ...s.settings, apiKey: k } }));
-    toast(k ? "API key saved on this device" : "API key removed");
-  };
 
   const download = () => {
     const blob = new Blob([exportJson()], { type: "application/json" });
@@ -51,12 +45,17 @@ export default function Me() {
 
       <section className="card stack" aria-labelledby="goal-h">
         <h2 id="goal-h">Goal and body</h2>
-        <div className="row between small"><span className="muted">Daily target</span><strong className="num">{dailyTarget(p).toLocaleString()} kcal</strong></div>
+        <div className="row between small"><span className="muted">{p.kcalOverride != null ? "Daily limit (your own)" : "Daily target"}</span><strong className="num">{dailyTarget(p).toLocaleString()} kcal</strong></div>
         <div className="row between small"><span className="muted">BMI</span><strong className="num">{Number.isFinite(p.weightKg) && Number.isFinite(p.heightCm) ? bmi(p.weightKg, p.heightCm) : "–"}</strong></div>
         <label className="field">First name<input className="input" value={p.name} onChange={(e) => setP({ ...p, name: e.target.value })} maxLength={40} /></label>
         <Seg label="Body type" value={p.sex} onChange={(v) => setP({ ...p, sex: v })} options={[{ v: "female", label: "Female" }, { v: "male", label: "Male" }]} />
-        <div className="grid2">{numIn("birthYear", "Year of birth", "yyyy")}{numIn("heightCm", "Height", "cm")}</div>
-        <div className="grid2">{numIn("weightKg", "Weight", "kg", 0.1)}{numIn("targetKg", "Goal weight", "kg", 0.1)}</div>
+        {numIn("birthYear", "Year of birth", "yyyy")}
+        <div className="field" role="group" aria-label="Units"><span>Units</span><UnitsToggle units={units} onChange={setUnits} /></div>
+        <HeightField key={"h" + units} cm={p.heightCm} onCm={(heightCm) => setP({ ...p, heightCm })} units={units} error={errors.heightCm} />
+        <div className="grid2">
+          <WeightField key={"w" + units} id="weightKg" label="Weight" kg={p.weightKg} onKg={(weightKg) => setP({ ...p, weightKg })} units={units} error={errors.weightKg} />
+          <WeightField key={"t" + units} id="targetKg" label="Goal weight" kg={p.targetKg} onKg={(targetKg) => setP({ ...p, targetKg })} units={units} error={errors.targetKg} />
+        </div>
         <label className="field">Activity
           <select className="input" value={p.activity} onChange={(e) => setP({ ...p, activity: e.target.value as Activity })}>
             {(Object.keys(ACTIVITY_LABEL) as Activity[]).map((a) => <option key={a} value={a}>{ACTIVITY_LABEL[a]}</option>)}
@@ -66,32 +65,13 @@ export default function Me() {
         {p.goal !== "maintain" && (
           <label className="field">Pace
             <select className="input" value={p.pace} onChange={(e) => setP({ ...p, pace: Number(e.target.value) })}>
-              <option value={0.25}>0.25 kg a week</option><option value={0.5}>0.5 kg a week</option><option value={0.75}>0.75 kg a week</option>
+              {[0.25, 0.5, 0.75].map((k) => <option key={k} value={k}>{paceLabel(k, units)}</option>)}
             </select>
           </label>
         )}
-        <label className="field">Set my own target (kcal, optional)
-          <input className="input num" inputMode="numeric" value={p.kcalOverride ?? ""} onChange={(e) => setP({ ...p, kcalOverride: e.target.value === "" ? null : Number(e.target.value) })} aria-invalid={!!errors.kcalOverride} />
-          {errors.kcalOverride && <span className="field-err">{errors.kcalOverride}</span>}
-        </label>
+        <LimitPicker p={p} onChange={(kcalOverride) => setP({ ...p, kcalOverride })} error={errors.kcalOverride} />
+        <CuisinePicker value={p.cuisines} onChange={(cuisines) => setP({ ...p, cuisines })} />
         <button className="btn" onClick={saveProfile}>Save</button>
-      </section>
-
-      <section className="card stack" aria-labelledby="snap-h" id="snap-settings">
-        <h2 id="snap-h">Photo estimates</h2>
-        <p className="small muted" style={{ margin: 0 }}>Uses your own key from <a href="https://console.anthropic.com/" target="_blank" rel="noreferrer">console.anthropic.com</a>. The key is stored only on this device and is never put in backups.</p>
-        <label className="field">Claude API key
-          <span className="row">
-            <input className="input" type={showKey ? "text" : "password"} value={key} onChange={(e) => setKey(e.target.value)} autoComplete="off" spellCheck={false} placeholder="sk-ant-…" />
-            <button className="icon-btn" type="button" onClick={() => setShowKey(!showKey)} aria-label={showKey ? "Hide key" : "Show key"}>{showKey ? <EyeOff size={18} /> : <Eye size={18} />}</button>
-          </span>
-        </label>
-        <label className="field">Model
-          <select className="input" value={settings.model} onChange={(e) => update((s) => ({ ...s, settings: { ...s.settings, model: e.target.value } }))}>
-            {SNAP_MODELS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
-          </select>
-        </label>
-        <button className="btn" onClick={saveKey}>Save key</button>
       </section>
 
       <section className="card stack" aria-labelledby="data-h">
@@ -128,7 +108,7 @@ export default function Me() {
       {confirmWipe && (
         <Sheet title="Delete everything?" onClose={() => setConfirmWipe(false)}>
           <div className="stack">
-            <p style={{ margin: 0 }}>This removes your profile, diary, weights, foods and API key from this device. It can't be undone. Back up first if you might want it later.</p>
+            <p style={{ margin: 0 }}>This removes your profile, diary, weights, and foods from this device. It can't be undone. Back up first if you might want it later.</p>
             <div className="row"><button className="btn ghost grow" onClick={() => setConfirmWipe(false)}>Keep my data</button><button className="btn danger grow" onClick={() => { wipeAll(); location.reload(); }}>Delete everything</button></div>
           </div>
         </Sheet>

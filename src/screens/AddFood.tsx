@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Barcode, Globe, Plus, Search } from "lucide-react";
-import { getFood, searchFoods, SOURCE_LABEL } from "../lib/foods";
+import { ArrowLeft, Barcode, ChefHat, Globe, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { CUISINES, cuisineLabel, getFood, removeFood, searchFoods, SOURCE_LABEL } from "../lib/foods";
 import { offBarcode, offSearch } from "../lib/off";
 import { addEntries, uid, update, useStore } from "../lib/store";
 import { MEALS } from "../lib/meals";
-import type { Food, MealKey } from "../lib/types";
+import type { Cuisine, Food, MealKey } from "../lib/types";
+import RecipeBuilder from "./RecipeBuilder";
 import PortionSheet, { makeEntry } from "../components/PortionSheet";
 import { Seg, Sheet, useToast } from "../components/ui";
 import { rememberFood } from "../lib/entryFood";
+import { useBackHandler } from "../lib/back";
 
 type Tab = "search" | "recent" | "mine";
 
@@ -17,7 +19,10 @@ export default function AddFood({ day, meal: meal0, onClose, ready }: { day: str
   const [tab, setTab] = useState<Tab>("search");
   const [picked, setPicked] = useState<Food | null>(null);
   const [online, setOnline] = useState<{ state: "idle" | "loading" | "done" | "error"; foods: Food[]; msg?: string }>({ state: "idle", foods: [] });
-  const [sheet, setSheet] = useState<"none" | "custom" | "quick" | "barcode">("none");
+  const [sheet, setSheet] = useState<"none" | "custom" | "quick" | "barcode" | "recipe">("none");
+  const [cuisine, setCuisine] = useState<Cuisine | null>(null);
+  const [editRecipe, setEditRecipe] = useState<Food | null>(null);
+  const [deleting, setDeleting] = useState<Food | null>(null);
   const profile = useStore((s) => s.profile);
   const settings = useStore((s) => s.settings);
   const recentIds = useStore((s) => s.recent);
@@ -26,10 +31,13 @@ export default function AddFood({ day, meal: meal0, onClose, ready }: { day: str
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
+  useBackHandler(onClose);
+  const searching = q.trim().length >= 2 || !!cuisine;
 
-  const results = useMemo(() => (ready && q.trim().length >= 2 ? searchFoods(q, { prefer: profile?.cuisines ?? [] }) : []), [q, ready, profile]);
+  const results = useMemo(() => (ready && (q.trim().length >= 2 || cuisine) ? searchFoods(q.trim().length >= 2 ? q : "", { prefer: profile?.cuisines ?? [], cuisine }) : []), [q, ready, profile, cuisine]);
   const recent = useMemo(() => recentIds.map((id) => getFood(id) ?? myFoods.find((f) => f.id === id)).filter((f): f is Food => !!f), [recentIds, myFoods]);
   const mine = useMemo(() => myFoods.filter((f) => f.src === "MY" && f.group !== "Photo estimate"), [myFoods]);
+  const delFood = (f: Food) => { update((s) => ({ ...s, myFoods: s.myFoods.filter((x) => x.id !== f.id), recent: s.recent.filter((id) => id !== f.id) })); removeFood(f.id); setDeleting(null); toast(`Deleted ${f.name}`); };
 
   useEffect(() => { setOnline({ state: "idle", foods: [] }); }, [q]);
 
@@ -45,7 +53,7 @@ export default function AddFood({ day, meal: meal0, onClose, ready }: { day: str
 
   const add = (food: Food, x: { grams: number; label: string; qty: number; meal: MealKey }) => {
     rememberFood(food);
-    addEntries([makeEntry(food, x, day, food.src === "OFF" ? "barcode" : "search", uid())]);
+    addEntries([makeEntry(food, x, day, food.src === "OFF" ? "barcode" : food.recipe ? "recipe" : "search", uid())]);
     setPicked(null);
     toast(`Added ${food.name} (${Math.round((food.kcal * x.grams) / 100)} kcal)`);
   };
@@ -67,29 +75,43 @@ export default function AddFood({ day, meal: meal0, onClose, ready }: { day: str
           </label>
           <div className="row" style={{ position: "relative" }}>
             <Search size={18} aria-hidden="true" style={{ position: "absolute", left: 12, color: "var(--text-muted)" }} />
-            <input ref={inputRef} className="input" style={{ paddingLeft: 38 }} type="search" placeholder="Search e.g. poha, croissant, pancakes" aria-label="Search foods"
+            <input ref={inputRef} className="input" style={{ paddingLeft: 38 }} type="search" placeholder="Search e.g. poha, bibimbap, croissant" aria-label="Search foods"
               value={q} onChange={(e) => { setQ(e.target.value); setTab("search"); }} />
           </div>
           <div className="row" style={{ flexWrap: "wrap" }}>
             <button className="btn soft sm" onClick={() => setSheet("quick")}><Plus size={16} /> Quick calories</button>
+            <button className="btn soft sm" onClick={() => setSheet("recipe")}><ChefHat size={16} /> Build from ingredients</button>
             <button className="btn soft sm" onClick={() => setSheet("custom")}><Plus size={16} /> New food</button>
             {settings.onlineSearch && <button className="btn soft sm" onClick={() => setSheet("barcode")}><Barcode size={16} /> Barcode</button>}
+          </div>
+          <div className="chip-row" role="group" aria-label="Cuisine">
+            <button aria-pressed={!cuisine} onClick={() => setCuisine(null)}>All cuisines</button>
+            {CUISINES.map((c) => <button key={c.v} aria-pressed={cuisine === c.v} onClick={() => { setCuisine(cuisine === c.v ? null : c.v); setTab("search"); }}>{c.label}</button>)}
           </div>
           <Seg<Tab> label="Food lists" value={tab} onChange={setTab} options={[{ v: "search", label: "Results" }, { v: "recent", label: "Recent" }, { v: "mine", label: "My foods" }]} />
 
           {!ready && <div className="row muted small"><div className="spinner" /> Loading the food list…</div>}
-          {tab === "search" && ready && q.trim().length < 2 && <p className="empty">Type at least 2 letters. 17,000+ Indian, French and American foods are on this device.</p>}
-          {tab === "search" && ready && q.trim().length >= 2 && results.length === 0 && <p className="empty">No match for "{q}". Try a shorter word, search online, or add it as a new food.</p>}
+          {tab === "search" && ready && !searching && <p className="empty">Type at least 2 letters, or pick a cuisine. 17,000+ foods are on this device: Indian, French, American, Korean, Japanese, Chinese, Thai, Italian, Mexican and more.</p>}
+          {tab === "search" && ready && searching && results.length === 0 && <div className="empty stack" style={{ alignItems: "center" }}>
+            <span>No match for "{q}"{cuisine ? ` in ${cuisineLabel(cuisine)}` : ""}. Try a shorter word, or build it from its ingredients.</span>
+            <button className="btn soft sm" onClick={() => setSheet("recipe")}><ChefHat size={16} /> Build "{q.trim() || "a dish"}" from ingredients</button>
+          </div>}
           {tab === "recent" && recent.length === 0 && <p className="empty">Foods you add show up here.</p>}
-          {tab === "mine" && mine.length === 0 && <p className="empty">Foods you create show up here.</p>}
+          {tab === "mine" && mine.length === 0 && <p className="empty">Foods and recipes you create show up here.</p>}
 
           {list.length > 0 && (
             <ul className="list card" style={{ padding: "4px 12px" }} aria-label="Foods">
-              {list.map((f) => <li key={f.id}><FoodRow f={f} onPick={() => setPicked(f)} /></li>)}
+              {list.map((f) => (
+                <li key={f.id} className={tab === "mine" ? "row" : undefined}>
+                  <FoodRow f={f} onPick={() => setPicked(f)} />
+                  {tab === "mine" && f.recipe && <button className="icon-btn" onClick={() => setEditRecipe(f)} aria-label={`Edit recipe ${f.name}`}><Pencil size={18} /></button>}
+                  {tab === "mine" && <button className="icon-btn" onClick={() => setDeleting(f)} aria-label={`Delete ${f.name}`}><Trash2 size={18} /></button>}
+                </li>
+              ))}
             </ul>
           )}
 
-          {tab === "search" && settings.onlineSearch && q.trim().length >= 2 && (
+          {tab === "search" && settings.onlineSearch && q.trim().length >= 2 && !cuisine && (
             <div className="stack">
               {online.state === "idle" && <button className="btn ghost" onClick={searchOnline}><Globe size={18} /> Search packaged foods online</button>}
               {online.state === "loading" && <div className="row muted small"><div className="spinner" /> Searching Open Food Facts…</div>}
@@ -111,6 +133,17 @@ export default function AddFood({ day, meal: meal0, onClose, ready }: { day: str
         addEntries([{ ...makeEntry(f, { grams: 100, label: "entry", qty: 1, meal }, day, "quick", uid()) }]);
         setSheet("none"); toast(`Added ${kcal} kcal`);
       }} />}
+      {(sheet === "recipe" || editRecipe) && <RecipeBuilder initialName={q.trim()} editing={editRecipe ?? undefined} ready={ready}
+        onClose={() => { setSheet("none"); setEditRecipe(null); }}
+        onSaved={(f) => { const wasEdit = !!editRecipe; setSheet("none"); setEditRecipe(null); if (wasEdit) toast(`Saved ${f.name}`); else setPicked(f); }} />}
+      {deleting && (
+        <Sheet title={`Delete ${deleting.name}?`} onClose={() => setDeleting(null)}>
+          <div className="stack">
+            <p style={{ margin: 0 }}>It leaves My foods. Meals you already logged with it stay in your diary.</p>
+            <div className="row"><button className="btn ghost grow" onClick={() => setDeleting(null)}>Keep it</button><button className="btn danger grow" onClick={() => delFood(deleting)}>Delete</button></div>
+          </div>
+        </Sheet>
+      )}
       {sheet === "barcode" && <BarcodeSheet onClose={() => setSheet("none")} onFound={(f) => { setSheet("none"); setPicked(f); }} />}
     </div>
   );

@@ -8,10 +8,13 @@
 | FR | ANSES-CIQUAL French food composition table, 2025 | ANSES | Licence Ouverte / Etalab 2.0 (attribution) | https://ciqual.anses.fr/ via data.gouv.fr; this build used a JSON mirror: https://github.com/OlivierFitter/ciqual_2025_complete |
 | US | USDA FNDDS survey foods, FoodData Central release 2022-10-28 | USDA Agricultural Research Service | Public domain (CC0) | https://fdc.nal.usda.gov/download-datasets ; build used the official JSON as mirrored at https://github.com/sukiboo/nutrition_info |
 | SR | USDA SR Legacy (April 2018) | USDA Agricultural Research Service | Public domain (CC0) | https://fdc.nal.usda.gov/download-datasets ; build used the official ASCII files as mirrored at https://github.com/cokegoddo/caloriebase |
+| RC | Thalika world dish estimates, 42 dishes (Korean, Japanese, Chinese, Thai, Vietnamese, Middle Eastern) | Typical home recipes written for this project (`data/world_recipes.json`), values computed from the SR Legacy rows above | Recipes: CC0. Values derive from CC0 data. Shown in the app as "World dish". These are estimates of a typical recipe, not lab measurements. | built by `scripts/build_food_db.py` |
 | OFF | Open Food Facts (live lookups only, not bundled) | Open Food Facts contributors | ODbL 1.0 (database), DbCL (contents) | https://world.openfoodfacts.org |
 
 Attribution is shown in the app under Me > About the food data.
 
 Notes
+- Cuisine tags (the filter chips in Add food) are added by the build from keywords in each food's name (for example "teriyaki" is Japanese, "burrito" is Mexican). Indian rows are tagged Indian; other CIQUAL rows French and FNDDS rows American unless a keyword says otherwise.
+- No openly licensed Korean, Chinese or Japanese composition table with English names was found. The Japanese MEXT tables exist as open JSON but only in Japanese, so world dishes come from recipes instead.
 - Raw Indian ingredients from the ICMR-NIN Indian Food Composition Tables (IFCT 2017) are **not** included: that table is not openly licensed. Raw ingredients come from USDA instead.
 - A few source rows look odd (for example INDB lists one pizza slice as 297 g). They are kept as published; the app shows the source so users can judge.

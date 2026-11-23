@@ -1,7 +1,12 @@
 import { useState } from "react";
-import type { Activity, GoalKind, Profile, Sex } from "../lib/types";
+import type { Activity, Cuisine, GoalKind, Profile, Sex, Units } from "../lib/types";
 import { ACTIVITY_LABEL, dailyTarget } from "../lib/nutrition";
+import { CUISINES } from "../lib/foods";
+import { update, useStore } from "../lib/store";
+import { heightText, weightText } from "../lib/units";
 import { Seg } from "../components/ui";
+import { HeightField, UnitsToggle, WeightField } from "../components/BodyInputs";
+import { LimitPicker, limitError } from "../components/LimitPicker";
 
 const THIS_YEAR = new Date().getFullYear();
 
@@ -10,14 +15,39 @@ export const blankProfile = (): Profile => ({
   activity: "light", goal: "lose", pace: 0.5, kcalOverride: null, cuisines: ["IN", "FR", "US"],
 });
 
-export function validateProfile(p: Profile): Record<string, string> {
+export function validateProfile(p: Profile, u: Units = "metric"): Record<string, string> {
   const e: Record<string, string> = {};
+  const wr = `${weightText(25, u)} and ${weightText(300, u)}`;
   if (!(p.birthYear >= THIS_YEAR - 100 && p.birthYear <= THIS_YEAR - 13)) e.birthYear = `Enter a year between ${THIS_YEAR - 100} and ${THIS_YEAR - 13}.`;
-  if (!(p.heightCm >= 100 && p.heightCm <= 250)) e.heightCm = "Enter a height between 100 and 250 cm.";
-  if (!(p.weightKg >= 25 && p.weightKg <= 300)) e.weightKg = "Enter a weight between 25 and 300 kg.";
-  if (!(p.targetKg >= 25 && p.targetKg <= 300)) e.targetKg = "Enter a goal weight between 25 and 300 kg.";
-  if (p.kcalOverride != null && !(p.kcalOverride >= 800 && p.kcalOverride <= 6000)) e.kcalOverride = "Enter a number between 800 and 6000, or leave it empty.";
+  if (!(p.heightCm >= 100 && p.heightCm <= 250)) e.heightCm = `Enter a height between ${heightText(100, u)} and ${heightText(250, u)}.`;
+  if (!(p.weightKg >= 25 && p.weightKg <= 300)) e.weightKg = `Enter a weight between ${wr}.`;
+  if (!(p.targetKg >= 25 && p.targetKg <= 300)) e.targetKg = `Enter a goal weight between ${wr}.`;
+  const le = limitError(p.kcalOverride);
+  if (le) e.kcalOverride = le;
   return e;
+}
+
+export const setUnits = (units: Units) => update((s) => ({ ...s, settings: { ...s.settings, units } }));
+
+/** Pace choices, labelled in the user's unit. */
+export function paceLabel(kg: number, u: Units) {
+  return u === "imperial" ? `${Math.round(kg * 2.2046 * 4) / 4} lb a week` : `${kg} kg a week`;
+}
+
+export function CuisinePicker({ value, onChange }: { value: Cuisine[]; onChange: (v: Cuisine[]) => void }) {
+  return (
+    <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
+      <legend className="small" style={{ fontWeight: 600, marginBottom: 8 }}>Which cuisines do you eat most? Search shows these first.</legend>
+      <div className="chips">
+        {CUISINES.map((c) => (
+          <label key={c.v} className="chip">
+            <input type="checkbox" checked={value.includes(c.v)} onChange={(e) => onChange(e.target.checked ? [...value, c.v] : value.filter((x) => x !== c.v))} />
+            <span>{c.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
 }
 
 export function profileFieldHelpers({ p, set, errors }: { p: Profile; set: (p: Profile) => void; errors: Record<string, string> }) {
@@ -37,11 +67,12 @@ export default function Onboarding({ onDone }: { onDone: (p: Profile) => void })
   const [step, setStep] = useState(0);
   const [p, setP] = useState<Profile>(blankProfile);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const units = useStore((s) => s.settings.units);
   const { numIn } = profileFieldHelpers({ p, set: setP, errors });
 
   const next = () => {
-    const e = validateProfile(p);
-    const keys = step === 0 ? ["birthYear", "heightCm", "weightKg"] : step === 2 ? ["targetKg"] : [];
+    const e = validateProfile(p, units);
+    const keys = step === 0 ? ["birthYear", "heightCm", "weightKg"] : step === 2 ? ["targetKg"] : step === 3 ? ["kcalOverride"] : [];
     const relevant = Object.fromEntries(Object.entries(e).filter(([k]) => keys.includes(k)));
     setErrors(relevant);
     if (Object.keys(relevant).length) return;
@@ -66,10 +97,12 @@ export default function Onboarding({ onDone }: { onDone: (p: Profile) => void })
               <Seg<Sex> label="Body type" value={p.sex} onChange={(v) => setP({ ...p, sex: v })} options={[{ v: "female", label: "Female" }, { v: "male", label: "Male" }]} />
             </div>
             {numIn("birthYear", "Year of birth", "e.g. 1995")}
-            <div className="grid2">
-              {numIn("heightCm", "Height", "cm")}
-              {numIn("weightKg", "Weight", "kg", 0.1)}
+            <div className="field" role="group" aria-label="Units">
+              <span>Units</span>
+              <UnitsToggle units={units} onChange={setUnits} />
             </div>
+            <HeightField cm={p.heightCm} onCm={(heightCm) => setP({ ...p, heightCm })} units={units} error={errors.heightCm} />
+            <WeightField id="weightKg" label="Weight" kg={p.weightKg} onKg={(weightKg) => setP({ ...p, weightKg })} units={units} error={errors.weightKg} />
           </>
         )}
         {step === 1 && (
@@ -90,12 +123,12 @@ export default function Onboarding({ onDone }: { onDone: (p: Profile) => void })
               options={[{ v: "lose", label: "Lose weight" }, { v: "maintain", label: "Stay the same" }, { v: "gain", label: "Gain weight" }]} />
             {p.goal !== "maintain" && (
               <>
-                {numIn("targetKg", "Goal weight", "kg", 0.1)}
+                <WeightField id="targetKg" label="Goal weight" kg={p.targetKg} onKg={(targetKg) => setP({ ...p, targetKg })} units={units} error={errors.targetKg} />
                 <label className="field">Pace
                   <select className="input" value={p.pace} onChange={(e) => setP({ ...p, pace: Number(e.target.value) })}>
-                    <option value={0.25}>Gentle: 0.25 kg a week</option>
-                    <option value={0.5}>Steady: 0.5 kg a week</option>
-                    <option value={0.75}>Fast: 0.75 kg a week</option>
+                    <option value={0.25}>Gentle: {paceLabel(0.25, units)}</option>
+                    <option value={0.5}>Steady: {paceLabel(0.5, units)}</option>
+                    <option value={0.75}>Fast: {paceLabel(0.75, units)}</option>
                   </select>
                 </label>
               </>
@@ -107,18 +140,10 @@ export default function Onboarding({ onDone }: { onDone: (p: Profile) => void })
             <h1 style={{ fontSize: "var(--fs-xl)", margin: "4px 0 0" }}>Your daily target</h1>
             <div className="card" style={{ textAlign: "center" }}>
               <div className="num" style={{ fontSize: "var(--fs-xxl)", fontWeight: 700 }}>{dailyTarget(p).toLocaleString()} kcal</div>
-              <p className="muted small" style={{ margin: 0 }}>Worked out with the Mifflin-St Jeor formula and your activity level. You can change it any time in Me.</p>
+              <p className="muted small" style={{ margin: 0 }}>{p.kcalOverride != null ? "Your own limit. " : "Worked out with the Mifflin-St Jeor formula and your activity level. "}You can change it any time by tapping the target on the diary.</p>
             </div>
-            <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
-              <legend className="small" style={{ fontWeight: 600, marginBottom: 8 }}>Which foods should search show first?</legend>
-              {([["IN", "Indian"], ["FR", "French"], ["US", "American"]] as const).map(([k, l]) => (
-                <label key={k} className="choice">
-                  <input type="checkbox" checked={p.cuisines.includes(k)}
-                    onChange={(e) => setP({ ...p, cuisines: e.target.checked ? [...p.cuisines, k] : p.cuisines.filter((c) => c !== k) })} />
-                  <span>{l}</span>
-                </label>
-              ))}
-            </fieldset>
+            <LimitPicker p={p} onChange={(kcalOverride) => setP({ ...p, kcalOverride })} error={errors.kcalOverride} />
+            <CuisinePicker value={p.cuisines} onChange={(cuisines) => setP({ ...p, cuisines })} />
             <p className="xs muted" style={{ margin: 0 }}>Thalika is a food diary, not medical advice. If you're pregnant, under 18 or managing a health condition, check your target with a doctor or dietitian.</p>
           </>
         )}

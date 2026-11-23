@@ -14,7 +14,7 @@ export interface State {
   water: WaterEntry[];
 }
 
-export const DEFAULT_SETTINGS: Settings = { apiKey: "", model: "claude-opus-5-5", onlineSearch: true, waterGoalMl: 2500 };
+export const DEFAULT_SETTINGS: Settings = { units: "metric", onlineSearch: true, waterGoalMl: 2500 };
 
 const empty = (): State => ({ profile: null, settings: { ...DEFAULT_SETTINGS }, log: [], myFoods: [], recent: [], weights: [], water: [] });
 
@@ -22,11 +22,16 @@ function read(): State {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return empty();
-    const s = JSON.parse(raw);
-    return { ...empty(), ...s, settings: { ...DEFAULT_SETTINGS, ...(s.settings ?? {}) } };
+    return normalize(JSON.parse(raw));
   } catch {
     return empty();
   }
+}
+
+/** Fill defaults and drop settings from older versions (the photo feature's API key). */
+function normalize(s: Partial<State>): State {
+  const { units, onlineSearch, waterGoalMl } = { ...DEFAULT_SETTINGS, ...(s.settings ?? {}) } as Settings;
+  return { ...empty(), ...s, settings: { units, onlineSearch, waterGoalMl } };
 }
 
 let state: State = read();
@@ -93,14 +98,13 @@ export function setWeight(day: string, kg: number) {
 }
 
 export function exportJson(): string {
-  return JSON.stringify({ app: "thalika", version: 1, exportedAt: new Date().toISOString(), data: { ...state, settings: { ...state.settings, apiKey: "" } } }, null, 1);
+  return JSON.stringify({ app: "thalika", version: 1, exportedAt: new Date().toISOString(), data: state }, null, 1);
 }
 
 export function importJson(text: string) {
   const j = JSON.parse(text);
   if (j?.app !== "thalika" || !j.data) throw new Error("This file isn't a Thalika backup.");
-  const keepKey = state.settings.apiKey;
-  commit({ ...empty(), ...j.data, settings: { ...DEFAULT_SETTINGS, ...j.data.settings, apiKey: keepKey } });
+  commit(normalize(j.data));
 }
 
 export function wipeAll() {
