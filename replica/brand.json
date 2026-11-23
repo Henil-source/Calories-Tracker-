@@ -1,0 +1,6 @@
+{
+  "name": "Thalika",
+  "avoid": ["HealthifyMe", "Healthify", "healthifyme.com", "Ria", "HealthifySnap", "Platewise", "Plate Wise"],
+  "domains": { "thalika.app": "to check", "thalika.com": "to check", "thalika.in": "to check" },
+  "colors": { "accent": "#17704a", "secondary": "#f2b33d", "bg": "#f6f7f4", "text": "#17211b" }
+}

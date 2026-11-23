@@ -1,0 +1,39 @@
+feature,area,priority,original,clone,notes
+Onboarding with calorie target (BMR x activity +/- goal),setup,must,yes,yes,Mifflin-St Jeor with safe floor
+Edit profile and own target,setup,must,yes,yes,
+Daily diary by meal,diary,must,yes,yes,5 meals
+Calories left ring and macros,diary,must,yes,yes,
+Browse past days,diary,must,yes,yes,
+Edit and remove entries,diary,must,yes,yes,
+Food search (local),food,must,yes,yes,"17,772 foods offline"
+Indian dishes,food,must,yes,yes,INDB 1014 recipes
+French foods,food,must,partial,yes,CIQUAL 3341 foods
+American foods,food,must,yes,yes,FNDDS 5624 + SR Legacy 7793
+Portions and units,food,must,yes,yes,household portions from source tables
+Recent foods,food,should,yes,yes,
+Custom food,food,should,yes,yes,
+Quick calories,food,should,yes,yes,
+Packaged foods online,food,should,yes,yes,Open Food Facts search
+Barcode lookup,food,could,yes,partial,typed digits only; no camera scanner yet
+Photo estimate of a meal,snap,must,yes,yes,Claude vision with user's own key
+Multiple items per photo,snap,must,yes,yes,
+Adjust weight and match per item,snap,must,partial,yes,grounded in the food table
+Gallery auto-logging,snap,could,yes,no,needs background photo access
+Voice logging,food,could,yes,no,
+Water tracking,habits,should,yes,yes,
+Weight log,progress,should,yes,yes,
+7 and 30 day chart and streak,progress,should,yes,yes,
+Reminders,habits,could,yes,no,needs native notifications plugin
+Android app,platform,must,yes,yes,Capacitor; APK built in CI
+Desktop app,platform,should,no,yes,Electron for Windows macOS Linux
+Dark mode,platform,should,yes,yes,
+Backup and restore,data,should,no,yes,JSON file; fix from reviews
+Delete all data in app,data,must,no,yes,fix from reviews
+No account needed and data stays on device,data,should,no,yes,fix from reviews
+No upsell or ads,data,should,no,yes,fix from reviews
+Show data source per food,food,should,no,yes,fix from reviews
+Cloud sync across devices,data,could,yes,no,see schema.sql for the plan
+Coaching and diet plans,service,skip,yes,skip,human service and brand
+AI coach persona,service,skip,yes,skip,brand
+Smart scale,hardware,skip,yes,skip,hardware
+Their food database and recognition model,data,skip,yes,skip,owned data; replaced by open data + Claude

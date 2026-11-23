@@ -1,0 +1,203 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Barcode, Globe, Plus, Search } from "lucide-react";
+import { getFood, searchFoods, SOURCE_LABEL } from "../lib/foods";
+import { offBarcode, offSearch } from "../lib/off";
+import { addEntries, uid, update, useStore } from "../lib/store";
+import { MEALS } from "../lib/meals";
+import type { Food, MealKey } from "../lib/types";
+import PortionSheet, { makeEntry } from "../components/PortionSheet";
+import { Seg, Sheet, useToast } from "../components/ui";
+import { rememberFood } from "../lib/entryFood";
+
+type Tab = "search" | "recent" | "mine";
+
+export default function AddFood({ day, meal: meal0, onClose, ready }: { day: string; meal: MealKey; onClose: () => void; ready: boolean }) {
+  const [meal, setMeal] = useState<MealKey>(meal0);
+  const [q, setQ] = useState("");
+  const [tab, setTab] = useState<Tab>("search");
+  const [picked, setPicked] = useState<Food | null>(null);
+  const [online, setOnline] = useState<{ state: "idle" | "loading" | "done" | "error"; foods: Food[]; msg?: string }>({ state: "idle", foods: [] });
+  const [sheet, setSheet] = useState<"none" | "custom" | "quick" | "barcode">("none");
+  const profile = useStore((s) => s.profile);
+  const settings = useStore((s) => s.settings);
+  const recentIds = useStore((s) => s.recent);
+  const myFoods = useStore((s) => s.myFoods);
+  const toast = useToast();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const results = useMemo(() => (ready && q.trim().length >= 2 ? searchFoods(q, { prefer: profile?.cuisines ?? [] }) : []), [q, ready, profile]);
+  const recent = useMemo(() => recentIds.map((id) => getFood(id) ?? myFoods.find((f) => f.id === id)).filter((f): f is Food => !!f), [recentIds, myFoods]);
+  const mine = useMemo(() => myFoods.filter((f) => f.src === "MY" && f.group !== "Photo estimate"), [myFoods]);
+
+  useEffect(() => { setOnline({ state: "idle", foods: [] }); }, [q]);
+
+  const searchOnline = async () => {
+    setOnline({ state: "loading", foods: [] });
+    try {
+      const foods = await offSearch(q.trim());
+      setOnline({ state: "done", foods });
+    } catch {
+      setOnline({ state: "error", foods: [], msg: "Couldn't reach Open Food Facts. Check your connection and try again." });
+    }
+  };
+
+  const add = (food: Food, x: { grams: number; label: string; qty: number; meal: MealKey }) => {
+    rememberFood(food);
+    addEntries([makeEntry(food, x, day, food.src === "OFF" ? "barcode" : "search", uid())]);
+    setPicked(null);
+    toast(`Added ${food.name} (${Math.round((food.kcal * x.grams) / 100)} kcal)`);
+  };
+
+  const list = tab === "search" ? results : tab === "recent" ? recent : mine;
+
+  return (
+    <div className="page-overlay" role="dialog" aria-modal="true" aria-labelledby="add-title">
+      <main className="main" style={{ paddingBottom: 32 }}>
+        <div className="topbar">
+          <button className="icon-btn" onClick={onClose} aria-label="Back to today"><ArrowLeft size={22} /></button>
+          <h1 id="add-title">Add food</h1>
+        </div>
+        <div className="stack">
+          <label className="field">Meal
+            <select className="input" value={meal} onChange={(e) => setMeal(e.target.value as MealKey)}>
+              {MEALS.map((m) => <option key={m.key} value={m.key}>{m.label}</option>)}
+            </select>
+          </label>
+          <div className="row" style={{ position: "relative" }}>
+            <Search size={18} aria-hidden="true" style={{ position: "absolute", left: 12, color: "var(--text-muted)" }} />
+            <input ref={inputRef} className="input" style={{ paddingLeft: 38 }} type="search" placeholder="Search e.g. poha, croissant, pancakes" aria-label="Search foods"
+              value={q} onChange={(e) => { setQ(e.target.value); setTab("search"); }} />
+          </div>
+          <div className="row" style={{ flexWrap: "wrap" }}>
+            <button className="btn soft sm" onClick={() => setSheet("quick")}><Plus size={16} /> Quick calories</button>
+            <button className="btn soft sm" onClick={() => setSheet("custom")}><Plus size={16} /> New food</button>
+            {settings.onlineSearch && <button className="btn soft sm" onClick={() => setSheet("barcode")}><Barcode size={16} /> Barcode</button>}
+          </div>
+          <Seg<Tab> label="Food lists" value={tab} onChange={setTab} options={[{ v: "search", label: "Results" }, { v: "recent", label: "Recent" }, { v: "mine", label: "My foods" }]} />
+
+          {!ready && <div className="row muted small"><div className="spinner" /> Loading the food list…</div>}
+          {tab === "search" && ready && q.trim().length < 2 && <p className="empty">Type at least 2 letters. 17,000+ Indian, French and American foods are on this device.</p>}
+          {tab === "search" && ready && q.trim().length >= 2 && results.length === 0 && <p className="empty">No match for "{q}". Try a shorter word, search online, or add it as a new food.</p>}
+          {tab === "recent" && recent.length === 0 && <p className="empty">Foods you add show up here.</p>}
+          {tab === "mine" && mine.length === 0 && <p className="empty">Foods you create show up here.</p>}
+
+          {list.length > 0 && (
+            <ul className="list card" style={{ padding: "4px 12px" }} aria-label="Foods">
+              {list.map((f) => <li key={f.id}><FoodRow f={f} onPick={() => setPicked(f)} /></li>)}
+            </ul>
+          )}
+
+          {tab === "search" && settings.onlineSearch && q.trim().length >= 2 && (
+            <div className="stack">
+              {online.state === "idle" && <button className="btn ghost" onClick={searchOnline}><Globe size={18} /> Search packaged foods online</button>}
+              {online.state === "loading" && <div className="row muted small"><div className="spinner" /> Searching Open Food Facts…</div>}
+              {online.state === "error" && <div className="notice err" role="alert">{online.msg}</div>}
+              {online.state === "done" && online.foods.length === 0 && <p className="empty">No packaged foods found online.</p>}
+              {online.foods.length > 0 && (
+                <ul className="list card" style={{ padding: "4px 12px" }} aria-label="Packaged foods from Open Food Facts">
+                  {online.foods.map((f) => <li key={f.id}><FoodRow f={f} onPick={() => setPicked(f)} /></li>)}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+      {picked && <PortionSheet food={picked} meal={meal} onClose={() => setPicked(null)} onAdd={(x) => add(picked, x)} />}
+      {sheet === "custom" && <CustomFoodSheet initialName={q} onClose={() => setSheet("none")} onSaved={(f) => { setSheet("none"); setPicked(f); }} />}
+      {sheet === "quick" && <QuickSheet onClose={() => setSheet("none")} onSave={(kcal, label) => {
+        const f: Food = { id: "quick:" + uid(), name: label || "Quick calories", alt: "", src: "MY", group: "Quick", kcal, protein: 0, carbs: 0, fat: 0, fibre: 0, portions: [] };
+        addEntries([{ ...makeEntry(f, { grams: 100, label: "entry", qty: 1, meal }, day, "quick", uid()) }]);
+        setSheet("none"); toast(`Added ${kcal} kcal`);
+      }} />}
+      {sheet === "barcode" && <BarcodeSheet onClose={() => setSheet("none")} onFound={(f) => { setSheet("none"); setPicked(f); }} />}
+    </div>
+  );
+}
+
+function FoodRow({ f, onPick }: { f: Food; onPick: () => void }) {
+  const p = f.portions[0];
+  return (
+    <button className="food-row" onClick={onPick}>
+      <span className="grow">
+        <span className="name ellipsis" style={{ display: "block" }}>{f.name}</span>
+        <span className="small muted ellipsis" style={{ display: "block" }}>
+          {p ? `${p.label} · ${Math.round((f.kcal * p.grams) / 100)} kcal` : `100 g · ${Math.round(f.kcal)} kcal`}{f.alt ? ` · ${f.alt}` : ""}
+        </span>
+      </span>
+      <span className={`badge ${f.src}`}>{SOURCE_LABEL[f.src]}</span>
+    </button>
+  );
+}
+
+function CustomFoodSheet({ initialName, onClose, onSaved }: { initialName: string; onClose: () => void; onSaved: (f: Food) => void }) {
+  const [v, setV] = useState({ name: initialName, serving: "1 serving", grams: "100", kcal: "", protein: "", carbs: "", fat: "" });
+  const [err, setErr] = useState("");
+  const save = () => {
+    const g = Number(v.grams), k = Number(v.kcal);
+    if (!v.name.trim()) return setErr("Give the food a name.");
+    if (!(g > 0)) return setErr("Enter the serving weight in grams.");
+    if (!(k >= 0) || v.kcal === "") return setErr("Enter the calories in one serving.");
+    const per = (x: string) => (x === "" ? 0 : Math.round((Number(x) / g) * 1000) / 10);
+    const f: Food = { id: "my:" + uid(), name: v.name.trim(), alt: "", src: "MY", group: "My foods", kcal: per(v.kcal), protein: per(v.protein), carbs: per(v.carbs), fat: per(v.fat), fibre: null, portions: [{ label: v.serving.trim() || "1 serving", grams: g }] };
+    update((s) => ({ ...s, myFoods: [...s.myFoods, f] }));
+    rememberFood(f);
+    onSaved(f);
+  };
+  const field = (k: keyof typeof v, label: string, num = true) => (
+    <label className="field">{label}<input className="input" inputMode={num ? "decimal" : undefined} value={v[k]} onChange={(e) => setV({ ...v, [k]: e.target.value })} /></label>
+  );
+  return (
+    <Sheet title="New food" onClose={onClose}>
+      <div className="stack">
+        {field("name", "Name", false)}
+        <div className="grid2">{field("serving", "Serving name", false)}{field("grams", "Serving weight (g)")}</div>
+        {field("kcal", "Calories per serving (kcal)")}
+        <div className="grid2">{field("protein", "Protein (g)")}{field("carbs", "Carbs (g)")}</div>
+        {field("fat", "Fat (g)")}
+        {err && <div className="field-err" role="alert">{err}</div>}
+        <button className="btn" onClick={save}>Save food</button>
+      </div>
+    </Sheet>
+  );
+}
+
+function QuickSheet({ onClose, onSave }: { onClose: () => void; onSave: (kcal: number, label: string) => void }) {
+  const [k, setK] = useState("");
+  const [label, setLabel] = useState("");
+  const n = Number(k);
+  const ok = k !== "" && n > 0 && n <= 10000;
+  return (
+    <Sheet title="Quick calories" onClose={onClose}>
+      <form className="stack" onSubmit={(e) => { e.preventDefault(); if (ok) onSave(Math.round(n), label.trim()); }}>
+        <label className="field">Calories (kcal)<input className="input num" inputMode="numeric" value={k} onChange={(e) => setK(e.target.value)} /></label>
+        <label className="field">What was it? (optional)<input className="input" value={label} onChange={(e) => setLabel(e.target.value)} maxLength={60} /></label>
+        <button className="btn" type="submit" disabled={!ok}>Add</button>
+      </form>
+    </Sheet>
+  );
+}
+
+function BarcodeSheet({ onClose, onFound }: { onClose: () => void; onFound: (f: Food) => void }) {
+  const [code, setCode] = useState("");
+  const [st, setSt] = useState<"idle" | "loading" | "none" | "error">("idle");
+  const look = async () => {
+    setSt("loading");
+    try {
+      const f = await offBarcode(code);
+      if (f) onFound(f); else setSt("none");
+    } catch { setSt("error"); }
+  };
+  return (
+    <Sheet title="Look up a barcode" onClose={onClose}>
+      <form className="stack" onSubmit={(e) => { e.preventDefault(); look(); }}>
+        <label className="field">Barcode number<input className="input num" inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. 8901058851427" /></label>
+        <span className="hint">Type the digits under the barcode on the pack. Looked up in Open Food Facts.</span>
+        {st === "none" && <div className="notice" role="alert">That barcode isn't in Open Food Facts yet. Add it as a new food instead.</div>}
+        {st === "error" && <div className="notice err" role="alert">Couldn't reach Open Food Facts. Check your connection.</div>}
+        <button className="btn" type="submit" disabled={code.replace(/\D/g, "").length < 6 || st === "loading"}>{st === "loading" ? "Looking up…" : "Look up"}</button>
+      </form>
+    </Sheet>
+  );
+}
